@@ -10,7 +10,6 @@ import type {
 } from "@/types";
 
 const contentPath = {
-  board: "/boards",
   notice: "/notices",
   inquiry: "/inquiries",
   qna: "/qnas",

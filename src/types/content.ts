@@ -1,4 +1,4 @@
-export type ContentKind = "board" | "notice" | "inquiry" | "qna";
+export type ContentKind = "notice" | "inquiry" | "qna";
 export type ContentStatus = "draft" | "published" | "answered" | "closed";
 
 export interface ContentItem {

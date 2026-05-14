@@ -40,14 +40,21 @@ npm run lint
 
 ## Environment
 
-`.env.example` 기준으로 mock API 사용 여부를 전환합니다.
+`.env.example` 기준으로 mock API 사용 여부와 배포 메뉴 노출 범위를 전환합니다.
 
 ```bash
 NEXT_PUBLIC_USE_MOCK_API=true
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+NEXT_PUBLIC_APP_ENV=local
+APP_ENABLED_FEATURES=dashboard,mypage,notices,inquiries,qna
+NEXT_PUBLIC_ENABLED_FEATURES=dashboard,mypage,notices,inquiries,qna
 ```
 
 `NEXT_PUBLIC_USE_MOCK_API=false`로 바꾸면 `src/lib/axios.ts`의 fetch client가 실제 API base URL을 사용합니다.
+
+`NEXT_PUBLIC_APP_ENV=local` 또는 개발 서버(`NODE_ENV=development`)에서는 모든 메뉴와 페이지가 열립니다. 배포 환경에서는 `NEXT_PUBLIC_APP_ENV=production`으로 두고 `APP_ENABLED_FEATURES`에 등록한 기능만 `src/proxy.ts`에서 접근 허용합니다. `NEXT_PUBLIC_ENABLED_FEATURES`는 사이드바와 바로가기 메뉴 노출용이며, 보통 `APP_ENABLED_FEATURES`와 같은 값으로 맞춥니다.
+
+사용 가능한 feature key는 `dashboard`, `mypage`, `user-permissions`, `login-history`, `organizations`, `data-codes`, `notices`, `inquiries`, `qna`, `storybook`, `error-preview`입니다.
 
 ## Routes
 
@@ -57,14 +64,18 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
 - `/signup`: 회원가입
 - `/logout`: 로그아웃 처리
 - `/dashboard`: 보호 라우트 예시
-- `/users`: 사용자 관리
-- `/boards`: 게시판
-- `/notices`: 공지사항
-- `/inquiries`: 질의/문의
-- `/qna`: Q&A
+- `/mypage`: 내 정보 확인/수정
+- `/users`: 사용자권한 정보
+- `/users/login-history`: 로그인 이력관리
+- `/organizations`: 조직관리
+- `/data/codes`: 코드관리
+- `/boards`: 활성화된 게시판 첫 메뉴로 이동
+- `/boards/notices`: 공지사항
+- `/boards/inquiries`: 질의/문의
+- `/boards/qna`: Q&A
 - `/error-preview`: 에러 타입별 화면 확인
 
-Next.js 16 기준으로 라우트 보호는 `middleware.ts`가 아니라 `src/proxy.ts`에서 처리합니다.
+Next.js 16 기준으로 라우트 보호와 feature flag 기반 페이지 차단은 `middleware.ts`가 아니라 `src/proxy.ts`에서 처리합니다.
 
 ## Components
 

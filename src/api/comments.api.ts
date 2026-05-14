@@ -2,7 +2,6 @@ import { apiClient } from "@/lib/axios";
 import type { ApiResponse, ContentComment, ContentKind, CreateCommentDto, UpdateCommentDto } from "@/types";
 
 const contentPath = {
-  board: "/boards",
   notice: "/notices",
   inquiry: "/inquiries",
   qna: "/qnas",

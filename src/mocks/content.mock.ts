@@ -18,8 +18,8 @@ export const mockContents: ContentItem[] = [
   },
   {
     id: 2,
-    kind: "board",
-    title: "프로젝트 템플릿 사용 가이드",
+    kind: "qna",
+    title: "프로젝트 템플릿은 어떻게 시작하나요?",
     content: "공통 컴포넌트와 mock API를 활용해 초기 화면을 빠르게 구성하는 방법입니다.",
     authorName: "김민준",
     status: "published",
@@ -54,7 +54,7 @@ export const mockContents: ContentItem[] = [
   },
   {
     id: 5,
-    kind: "board",
+    kind: "inquiry",
     title: "대시보드 지표 정의 초안",
     content: "가입자, 활성 세션, 문의 처리율을 기본 지표로 사용합니다.",
     authorName: "최유나",

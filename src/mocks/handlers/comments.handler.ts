@@ -4,7 +4,6 @@ import { fail, getId, ok, type MockRequest } from "../mock-utils";
 import { mockStore } from "../mock-store";
 
 function getContentKind(path: string): ContentKind | null {
-  if (path.startsWith("/boards")) return "board";
   if (path.startsWith("/notices")) return "notice";
   if (path.startsWith("/inquiries")) return "inquiry";
   if (path.startsWith("/qnas")) return "qna";
@@ -13,7 +12,6 @@ function getContentKind(path: string): ContentKind | null {
 
 function getContentPrefix(kind: ContentKind) {
   const map = {
-    board: "/boards/",
     notice: "/notices/",
     inquiry: "/inquiries/",
     qna: "/qnas/",

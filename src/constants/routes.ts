@@ -16,9 +16,9 @@ export const ROUTES = {
   ORGANIZATIONS: "/organizations",
   DATA_CODES: "/data/codes",
   BOARDS: "/boards",
-  NOTICES: "/notices",
-  INQUIRIES: "/inquiries",
-  QNA: "/qna",
+  NOTICES: "/boards/notices",
+  INQUIRIES: "/boards/inquiries",
+  QNA: "/boards/qna",
 
   USERS: {
     ROOT:   "/users",

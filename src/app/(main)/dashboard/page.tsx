@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Building2, Database, HelpCircle, History, LogOut, MessageSquareText, Palette, Settings, UserRound, Users } from "lucide-react";
+import { LogOut, Palette, Settings } from "lucide-react";
 import { AuthGuard } from "@/components/auth";
 import { BarChart, ChartCard, LineChart } from "@/components/charts";
 import { Footer, Header, MainLayout, PageWrapper } from "@/components/layout";
+import { getAdminQuickLinks, getAdminSidebarItems, isStorybookMenuEnabled } from "@/components/layout/admin-navigation";
 import { Badge, Button, Card, CardHeader, CardTitle, CardDescription, Table } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
+import { FEATURE_KEYS, isFeatureEnabled } from "@/lib/feature-flags";
 
 const stats = [
   { label: "총 사용자", value: "1,284", change: "+12%", up: true },
@@ -49,34 +51,8 @@ const logColumns = [
 ];
 
 export default function DashboardPage() {
-  const sidebarItems = [
-    { label: "대시보드", href: ROUTES.DASHBOARD, icon: Settings, exact: true },
-    { label: "마이페이지", href: ROUTES.MY_PAGE, icon: UserRound, exact: true },
-    {
-      label: "사용자 관리",
-      icon: Users,
-      children: [
-        { label: "사용자권한 정보", href: ROUTES.USERS.ROOT, icon: Users, exact: true },
-        { label: "로그인 이력", href: ROUTES.USERS.LOGIN_HISTORY, icon: History },
-        { label: "조직관리", href: ROUTES.ORGANIZATIONS, icon: Building2 },
-      ],
-    },
-    {
-      label: "데이터 관리",
-      icon: Database,
-      children: [{ label: "코드관리", href: ROUTES.DATA_CODES, icon: Database }],
-    },
-    {
-      label: "게시판",
-      icon: MessageSquareText,
-      children: [
-        { label: "게시판", href: ROUTES.BOARDS, icon: MessageSquareText, exact: true },
-        { label: "공지사항", href: ROUTES.NOTICES, icon: Bell },
-        { label: "질의", href: ROUTES.INQUIRIES, icon: HelpCircle },
-        { label: "Q&A", href: ROUTES.QNA, icon: MessageSquareText },
-      ],
-    },
-  ];
+  const sidebarItems = getAdminSidebarItems();
+  const quickLinks = getAdminQuickLinks();
 
   return (
     <AuthGuard>
@@ -89,7 +65,7 @@ export default function DashboardPage() {
             </span>
           ),
           items: sidebarItems,
-          footer: (
+          footer: isStorybookMenuEnabled() ? (
             <Link
               href={ROUTES.STORYBOOK}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-primary-600 transition-colors hover:bg-primary-50"
@@ -97,7 +73,7 @@ export default function DashboardPage() {
               <Palette className="h-4 w-4" aria-hidden="true" />
               컴포넌트 보기
             </Link>
-          ),
+          ) : null,
         }}
         topbar={
           <Header
@@ -123,18 +99,22 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span>Admin 템플릿 운영 화면</span>
               <div className="flex items-center gap-3">
-                <Link className="hover:text-primary-600 hover:underline" href={ROUTES.STORYBOOK}>
-                  컴포넌트
-                </Link>
+                {isStorybookMenuEnabled() && (
+                  <Link className="hover:text-primary-600 hover:underline" href={ROUTES.STORYBOOK}>
+                    컴포넌트
+                  </Link>
+                )}
                 <Link className="hover:text-primary-600 hover:underline" href={ROUTES.AUTH.LOGIN}>
                   로그인
                 </Link>
                 <Link className="hover:text-primary-600 hover:underline" href={ROUTES.AUTH.SIGNUP}>
                   회원가입
                 </Link>
-                <Link className="hover:text-primary-600 hover:underline" href={ROUTES.MY_PAGE}>
-                  마이페이지
-                </Link>
+                {isFeatureEnabled(FEATURE_KEYS.MY_PAGE) && (
+                  <Link className="hover:text-primary-600 hover:underline" href={ROUTES.MY_PAGE}>
+                    마이페이지
+                  </Link>
+                )}
               </div>
             </div>
           </Footer>
@@ -154,16 +134,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-6">
-            {[
-              { title: "사용자권한 정보", description: "가입자와 권한 관리", href: ROUTES.USERS.ROOT, icon: Users },
-              { title: "로그인 이력", description: "접속 성공/실패 확인", href: ROUTES.USERS.LOGIN_HISTORY, icon: History },
-              { title: "조직관리", description: "조직코드와 활성 상태", href: ROUTES.ORGANIZATIONS, icon: Building2 },
-              { title: "코드관리", description: "대/중/소 분류 코드", href: ROUTES.DATA_CODES, icon: Database },
-              { title: "게시판", description: "일반 게시글 관리", href: ROUTES.BOARDS, icon: MessageSquareText },
-              { title: "공지사항", description: "고정 공지 및 운영 안내", href: ROUTES.NOTICES, icon: Bell },
-              { title: "질의", description: "문의 접수 및 처리", href: ROUTES.INQUIRIES, icon: HelpCircle },
-              { title: "Q&A", description: "자주 묻는 질문 관리", href: ROUTES.QNA, icon: MessageSquareText },
-            ].map((item) => {
+            {quickLinks.map((item) => {
               const Icon = item.icon;
               return (
                 <Link key={item.href} href={item.href}>

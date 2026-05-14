@@ -2,12 +2,22 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getSafeReturnPath } from "@/lib/auth-redirect";
+import { isRouteFeatureEnabled } from "@/lib/feature-flags";
 
-const PROTECTED_ROUTES = ["/dashboard", "/mypage", "/organizations", "/data", "/settings", "/users", "/boards", "/notices", "/inquiries", "/qna"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/logout", "/find-id", "/find-password", "/storybook", "/error-preview"];
+
+function isPublicRoute(pathname: string) {
+  return PUBLIC_ROUTES.some((route) => pathname === route || (route !== "/" && pathname.startsWith(`${route}/`)));
+}
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (!isRouteFeatureEnabled(pathname)) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
+  const isProtected = !isPublicRoute(pathname);
   const token = request.cookies.get("access_token")?.value;
 
   if (isProtected && !token) {
@@ -25,17 +35,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/mypage/:path*",
-    "/organizations/:path*",
-    "/data/:path*",
-    "/settings/:path*",
-    "/users/:path*",
-    "/boards/:path*",
-    "/notices/:path*",
-    "/inquiries/:path*",
-    "/qna/:path*",
-    "/login",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)"],
 };
