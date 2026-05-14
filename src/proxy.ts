@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 import { getSafeReturnPath } from "@/lib/auth-redirect";
 
-const PROTECTED_ROUTES = ["/dashboard", "/settings", "/users", "/boards", "/notices", "/inquiries", "/qna"];
+const PROTECTED_ROUTES = ["/dashboard", "/mypage", "/organizations", "/data", "/settings", "/users", "/boards", "/notices", "/inquiries", "/qna"];
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -27,6 +27,9 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/mypage/:path*",
+    "/organizations/:path*",
+    "/data/:path*",
     "/settings/:path*",
     "/users/:path*",
     "/boards/:path*",

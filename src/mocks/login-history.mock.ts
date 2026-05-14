@@ -1,0 +1,45 @@
+import type { LoginHistory } from "@/types";
+
+export const mockLoginHistory: LoginHistory[] = [
+  {
+    id: 1,
+    userId: 1,
+    userName: "김민준",
+    email: "minjun.kim@example.com",
+    ipAddress: "203.0.113.10",
+    userAgent: "Chrome / macOS",
+    status: "success",
+    createdAt: "2026-05-14T08:12:00.000Z",
+  },
+  {
+    id: 2,
+    userId: 2,
+    userName: "이서연",
+    email: "seoyeon.lee@example.com",
+    ipAddress: "198.51.100.21",
+    userAgent: "Edge / Windows",
+    status: "success",
+    createdAt: "2026-05-14T07:48:00.000Z",
+  },
+  {
+    id: 3,
+    userId: 3,
+    userName: "박도현",
+    email: "dohyun.park@example.com",
+    ipAddress: "203.0.113.45",
+    userAgent: "Safari / iOS",
+    status: "failure",
+    reason: "비밀번호 불일치",
+    createdAt: "2026-05-14T07:21:00.000Z",
+  },
+  {
+    id: 4,
+    userId: 5,
+    userName: "정하준",
+    email: "hajun.jung@example.com",
+    ipAddress: "192.0.2.88",
+    userAgent: "Chrome / Android",
+    status: "success",
+    createdAt: "2026-05-13T23:10:00.000Z",
+  },
+];

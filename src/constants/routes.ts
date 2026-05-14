@@ -12,6 +12,9 @@ export const ROUTES = {
   },
 
   DASHBOARD: "/dashboard",
+  MY_PAGE: "/mypage",
+  ORGANIZATIONS: "/organizations",
+  DATA_CODES: "/data/codes",
   BOARDS: "/boards",
   NOTICES: "/notices",
   INQUIRIES: "/inquiries",
@@ -19,6 +22,7 @@ export const ROUTES = {
 
   USERS: {
     ROOT:   "/users",
+    LOGIN_HISTORY: "/users/login-history",
     DETAIL: (id: number | string) => `/users/${id}`,
     EDIT:   (id: number | string) => `/users/${id}/edit`,
   },

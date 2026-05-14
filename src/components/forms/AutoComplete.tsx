@@ -19,6 +19,7 @@ interface AutoCompleteProps {
 
 export function AutoComplete({ options, value, onChange, onSelect, placeholder }: AutoCompleteProps) {
   const [internalValue, setInternalValue] = useState(value ?? "");
+  const [open, setOpen] = useState(false);
   const inputValue = value ?? internalValue;
   const filtered = useMemo(
     () => options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase())).slice(0, 8),
@@ -31,23 +32,43 @@ export function AutoComplete({ options, value, onChange, onSelect, placeholder }
   };
 
   return (
-    <div className="relative">
-      <Input value={inputValue} onChange={(event) => update(event.target.value)} placeholder={placeholder} />
-      {inputValue && filtered.length > 0 && (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+    >
+      <Input
+        value={inputValue}
+        onChange={(event) => {
+          update(event.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => {
+          window.setTimeout(() => setOpen(false), 120);
+        }}
+        placeholder={placeholder}
+      />
+      {open && (
         <div className="absolute top-full z-50 mt-1 w-full rounded-md border border-border bg-surface p-1 shadow-lg">
-          {filtered.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                update(option.label);
-                onSelect?.(option);
-              }}
-              className="block w-full rounded px-3 py-2 text-left text-sm text-text hover:bg-surface-2"
-            >
-              {option.label}
-            </button>
-          ))}
+          {filtered.length > 0 ? (
+            filtered.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  update(option.label);
+                  onSelect?.(option);
+                  setOpen(false);
+                }}
+                className="block w-full rounded px-3 py-2 text-left text-sm text-text hover:bg-surface-2"
+              >
+                {option.label}
+              </button>
+            ))
+          ) : (
+            <p className="px-3 py-2 text-sm text-text-muted">일치하는 항목이 없습니다.</p>
+          )}
         </div>
       )}
     </div>

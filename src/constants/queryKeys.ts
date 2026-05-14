@@ -1,4 +1,11 @@
-import type { ContentKind, ContentListParams, UserListParams } from "@/types";
+import type {
+  ContentKind,
+  ContentListParams,
+  DataCodeListParams,
+  LoginHistoryListParams,
+  OrganizationListParams,
+  UserListParams,
+} from "@/types";
 
 /** React Query 키: 캐시 무효화 기준을 한 곳에서 관리합니다. */
 export const QUERY_KEYS = {
@@ -10,6 +17,19 @@ export const QUERY_KEYS = {
     lists: () => ["users", "list"] as const,
     list: (params: UserListParams) => ["users", "list", params] as const,
     detail: (id: number) => ["users", "detail", id] as const,
+  },
+  LOGIN_HISTORY: {
+    lists: () => ["login-history", "list"] as const,
+    list: (params: LoginHistoryListParams) => ["login-history", "list", params] as const,
+  },
+  ORGANIZATIONS: {
+    lists: () => ["organizations", "list"] as const,
+    list: (params: OrganizationListParams) => ["organizations", "list", params] as const,
+  },
+  DATA_CODES: {
+    lists: () => ["data-codes", "list"] as const,
+    list: (params: DataCodeListParams) => ["data-codes", "list", params] as const,
+    check: (code: string) => ["data-codes", "check", code] as const,
   },
   CONTENTS: {
     all: (kind: ContentKind) => [kind] as const,

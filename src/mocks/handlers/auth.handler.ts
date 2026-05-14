@@ -1,4 +1,4 @@
-import type { FindIdDto, FindPasswordDto, LoginDto, SignupDto } from "@/types/auth";
+import type { FindIdDto, FindPasswordDto, LoginDto, SignupDto, UpdateProfileDto } from "@/types/auth";
 import type { User } from "@/types/user";
 
 import { fail, ok, type MockRequest } from "../mock-utils";
@@ -26,6 +26,11 @@ function login(body: unknown) {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
+      avatarUrl: user.avatarUrl,
+      birthDate: user.birthDate,
+      phone: user.phone,
+      address: user.address,
     },
   });
 }
@@ -61,6 +66,11 @@ function signup(body: unknown) {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
+      avatarUrl: user.avatarUrl,
+      birthDate: user.birthDate,
+      phone: user.phone,
+      address: user.address,
     },
   });
 }
@@ -92,6 +102,50 @@ function findPassword(body: unknown) {
   });
 }
 
+function updateMe(body: unknown) {
+  const dto = body as UpdateProfileDto;
+  if (!dto.name?.trim()) {
+    fail(400, "이름을 입력해주세요.");
+  }
+
+  const updated = {
+    ...mockStore.currentUser,
+    name: dto.name.trim(),
+    birthDate: dto.birthDate,
+    phone: dto.phone,
+    address: dto.address,
+    updatedAt: new Date().toISOString(),
+  };
+
+  mockStore.currentUser = updated;
+  mockStore.users = mockStore.users.map((user) => (user.id === updated.id ? updated : user));
+
+  return ok({
+    id: updated.id,
+    name: updated.name,
+    email: updated.email,
+    role: updated.role,
+    status: updated.status,
+    avatarUrl: updated.avatarUrl,
+    birthDate: updated.birthDate,
+    phone: updated.phone,
+    address: updated.address,
+  }, "내 정보가 수정되었습니다.");
+}
+
+function withdrawMe() {
+  const updated = {
+    ...mockStore.currentUser,
+    status: "withdrawn" as const,
+    updatedAt: new Date().toISOString(),
+  };
+
+  mockStore.currentUser = updated;
+  mockStore.users = mockStore.users.map((user) => (user.id === updated.id ? updated : user));
+
+  return ok(null, "회원 탈퇴가 처리되었습니다.");
+}
+
 export function handleAuthMock({ method, path, body }: MockRequest) {
   if (method === "POST" && path === "/auth/login") {
     return login(body);
@@ -119,7 +173,20 @@ export function handleAuthMock({ method, path, body }: MockRequest) {
       name: mockStore.currentUser.name,
       email: mockStore.currentUser.email,
       role: mockStore.currentUser.role,
+      status: mockStore.currentUser.status,
+      avatarUrl: mockStore.currentUser.avatarUrl,
+      birthDate: mockStore.currentUser.birthDate,
+      phone: mockStore.currentUser.phone,
+      address: mockStore.currentUser.address,
     });
+  }
+
+  if (method === "PATCH" && path === "/auth/me") {
+    return updateMe(body);
+  }
+
+  if (method === "POST" && path === "/auth/withdraw") {
+    return withdrawMe();
   }
 
   if (method === "POST" && path === "/auth/refresh") {

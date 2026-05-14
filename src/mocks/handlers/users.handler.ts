@@ -45,6 +45,17 @@ function updateUser(id: number, dto: UpdateUserDto) {
   return ok(updated, "사용자가 수정되었습니다.");
 }
 
+function withdrawUser(id: number) {
+  const target = mockStore.users.find((user) => user.id === id);
+  if (!target) fail(404, "사용자를 찾을 수 없습니다.");
+
+  const updated = { ...target, status: "withdrawn" as const, updatedAt: new Date().toISOString() };
+  mockStore.users = mockStore.users.map((user) => (user.id === id ? updated : user));
+  if (mockStore.currentUser?.id === id) mockStore.currentUser = updated;
+
+  return ok(updated, "사용자가 탈퇴 처리되었습니다.");
+}
+
 function deleteUser(id: number) {
   const exists = mockStore.users.some((user) => user.id === id);
   if (!exists) fail(404, "사용자를 찾을 수 없습니다.");
@@ -64,6 +75,12 @@ export function handleUsersMock({ method, path, params, body }: MockRequest) {
 
   if (!path.startsWith("/users/")) {
     return undefined;
+  }
+
+  if (method === "PATCH" && path.endsWith("/withdraw")) {
+    const id = getId(path.replace("/withdraw", ""), "/users/");
+    if (!id) fail(400, "잘못된 사용자 ID입니다.");
+    return withdrawUser(id);
   }
 
   const id = getId(path, "/users/");

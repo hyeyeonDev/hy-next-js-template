@@ -12,15 +12,7 @@ export function getChartBaseOption(isDark: boolean): EChartsOption {
       color: textColor,
       fontFamily: "inherit",
     },
-    grid: {
-      left: 16,
-      right: 16,
-      top: 40,
-      bottom: 16,
-      containLabel: true,
-    },
     tooltip: {
-      trigger: "axis",
       backgroundColor: isDark ? "#111827" : "#ffffff",
       borderColor,
       textStyle: {
@@ -31,6 +23,21 @@ export function getChartBaseOption(isDark: boolean): EChartsOption {
       textStyle: {
         color: mutedColor,
       },
+    },
+  };
+}
+
+export function getCartesianChartOption(isDark: boolean): EChartsOption {
+  const mutedColor = isDark ? "#9ca3af" : "#6b7280";
+  const borderColor = isDark ? "#374151" : "#e5e7eb";
+
+  return {
+    grid: {
+      left: 16,
+      right: 16,
+      top: 40,
+      bottom: 16,
+      containLabel: true,
     },
     xAxis: {
       axisLine: {

@@ -44,6 +44,19 @@ export function useUpdateUserMutation() {
   });
 }
 
+export function useWithdrawUserMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: userService.withdraw,
+    onSuccess: (updatedUser) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS.lists() });
+      queryClient.setQueryData(QUERY_KEYS.USERS.detail(updatedUser.id), updatedUser);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.me() });
+    },
+  });
+}
+
 export function useDeleteUserMutation() {
   const queryClient = useQueryClient();
 

@@ -1,6 +1,9 @@
 import { handleAuthMock } from "./handlers/auth.handler";
 import { handleCommentsMock } from "./handlers/comments.handler";
 import { handleContentMock } from "./handlers/content.handler";
+import { handleDataCodesMock } from "./handlers/data-codes.handler";
+import { handleLoginHistoryMock } from "./handlers/login-history.handler";
+import { handleOrganizationsMock } from "./handlers/organizations.handler";
 import { handleUsersMock } from "./handlers/users.handler";
 import { fail, parsePath, wait, type HttpMethod } from "./mock-utils";
 
@@ -11,7 +14,15 @@ interface MockApiRequest {
   body?: unknown;
 }
 
-const handlers = [handleAuthMock, handleUsersMock, handleCommentsMock, handleContentMock];
+const handlers = [
+  handleAuthMock,
+  handleUsersMock,
+  handleLoginHistoryMock,
+  handleOrganizationsMock,
+  handleDataCodesMock,
+  handleCommentsMock,
+  handleContentMock,
+];
 
 export async function handleMockRequest<T>({ method, url, params, body }: MockApiRequest): Promise<T> {
   await wait();

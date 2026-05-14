@@ -22,6 +22,11 @@ export const userService = {
     return data.data;
   },
 
+  withdraw: async (id: number) => {
+    const { data } = await apiClient.patch<ApiResponse<User>>(`/users/${id}/withdraw`);
+    return data.data;
+  },
+
   delete: async (id: number) => {
     await apiClient.delete(`/users/${id}`);
   },

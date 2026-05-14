@@ -29,8 +29,16 @@ export function PieChart({ data, donut = true, className }: PieChartProps) {
           radius: donut ? ["48%", "70%"] : "70%",
           center: ["50%", "44%"],
           avoidLabelOverlap: true,
+          // itemStyle: {
+          //   borderRadius: 10,
+          //   borderColor: "#fff",
+          //   borderWidth: 1,
+          // },
           label: {
             formatter: "{b}\n{d}%",
+          },
+          labelLine: {
+            show: true,
           },
           data,
         },

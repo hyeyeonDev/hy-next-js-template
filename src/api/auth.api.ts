@@ -10,6 +10,7 @@ import type {
   LoginResponse,
   RefreshTokenResponse,
   SignupDto,
+  UpdateProfileDto,
 } from "@/types";
 
 export const authService = {
@@ -40,6 +41,15 @@ export const authService = {
   me: async () => {
     const { data } = await apiClient.get<ApiResponse<AuthUser>>("/auth/me");
     return data.data;
+  },
+
+  updateMe: async (dto: UpdateProfileDto) => {
+    const { data } = await apiClient.patch<ApiResponse<AuthUser>>("/auth/me", dto);
+    return data.data;
+  },
+
+  withdrawMe: async () => {
+    await apiClient.post("/auth/withdraw");
   },
 
   refresh: async () => {

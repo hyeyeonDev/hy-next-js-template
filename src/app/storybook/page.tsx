@@ -285,7 +285,7 @@ export default function StorybookPage() {
 
       {/* ── Dark Mode ── */}
       <Section
-        id="darkmode"
+        id="darkMode"
         title="Dark Mode"
         description="useTheme() 훅으로 토글. html에 .dark 클래스를 붙이면 자동 전환."
       >
@@ -351,7 +351,10 @@ export default function StorybookPage() {
         title="Layout"
         description="페이지 골격을 구성하는 Container, Header, Footer, PageWrapper, Section 컴포넌트입니다."
       >
-        <LayoutContainer size="md" className="rounded-lg border border-border bg-bg py-4">
+        <LayoutContainer
+          size="md"
+          className="rounded-lg border border-border bg-bg py-4"
+        >
           <LayoutHeader
             title="페이지 헤더"
             actions={
@@ -362,8 +365,14 @@ export default function StorybookPage() {
             className="rounded-t-md"
           />
           <div className="bg-surface p-4">
-            <LayoutPageWrapper title="페이지 제목" description="페이지 설명과 액션 영역을 일관되게 배치합니다.">
-              <LayoutSection title="섹션 제목" description="반복되는 화면 섹션을 구성합니다.">
+            <LayoutPageWrapper
+              title="페이지 제목"
+              description="페이지 설명과 액션 영역을 일관되게 배치합니다."
+            >
+              <LayoutSection
+                title="섹션 제목"
+                description="반복되는 화면 섹션을 구성합니다."
+              >
                 <div className="rounded-md border border-border bg-surface-2 p-4 text-sm text-text-muted">
                   콘텐츠 영역
                 </div>
@@ -588,7 +597,11 @@ export default function StorybookPage() {
             items={[
               { label: "수정", onClick: () => toast("수정 선택", "primary") },
               { label: "복제", onClick: () => toast("복제 선택", "secondary") },
-              { label: "삭제", danger: true, onClick: () => toast("삭제 선택", "danger") },
+              {
+                label: "삭제",
+                danger: true,
+                onClick: () => toast("삭제 선택", "danger"),
+              },
             ]}
           />
           <Button variant="outline" onClick={() => setCommandOpen(true)}>
@@ -596,7 +609,11 @@ export default function StorybookPage() {
           </Button>
         </Row>
 
-        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title="상세 설정">
+        <Drawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title="상세 설정"
+        >
           <div className="space-y-4">
             <FormField label="이름">
               <Input defaultValue="신규 프로젝트" />
@@ -620,9 +637,24 @@ export default function StorybookPage() {
           open={commandOpen}
           onClose={() => setCommandOpen(false)}
           items={[
-            { id: "dashboard", label: "대시보드 이동", description: "주요 지표 화면", onSelect: () => toast("대시보드", "primary") },
-            { id: "user", label: "사용자 추가", description: "새 사용자 생성", onSelect: () => toast("사용자 추가", "success") },
-            { id: "settings", label: "환경설정 열기", description: "권한 및 시스템 설정", onSelect: () => toast("환경설정", "secondary") },
+            {
+              id: "dashboard",
+              label: "대시보드 이동",
+              description: "주요 지표 화면",
+              onSelect: () => toast("대시보드", "primary"),
+            },
+            {
+              id: "user",
+              label: "사용자 추가",
+              description: "새 사용자 생성",
+              onSelect: () => toast("사용자 추가", "success"),
+            },
+            {
+              id: "settings",
+              label: "환경설정 열기",
+              description: "권한 및 시스템 설정",
+              onSelect: () => toast("환경설정", "secondary"),
+            },
           ]}
         />
 
@@ -633,7 +665,9 @@ export default function StorybookPage() {
             <Row>
               <Chip>운영</Chip>
               <Chip className="bg-primary-50 text-primary-700">디자인</Chip>
-              <Chip onRemove={() => toast("태그 삭제", "secondary")}>삭제 가능</Chip>
+              <Chip onRemove={() => toast("태그 삭제", "secondary")}>
+                삭제 가능
+              </Chip>
             </Row>
           </div>
           <div>
@@ -659,7 +693,11 @@ export default function StorybookPage() {
           </div>
           <div>
             <p className="mb-2 text-sm font-medium text-text">ColorPicker</p>
-            <ColorPicker value={color} onChange={setColor} label="브랜드 색상" />
+            <ColorPicker
+              value={color}
+              onChange={setColor}
+              label="브랜드 색상"
+            />
           </div>
           <div>
             <p className="mb-2 text-sm font-medium text-text">Divider</p>
@@ -858,7 +896,11 @@ export default function StorybookPage() {
           <ChartCard title="콘텐츠 처리량" description="막대 차트">
             <BarChart categories={chartCategories} series={contentSeries} />
           </ChartCard>
-          <ChartCard title="권한 비율" description="도넛 차트" className="lg:col-span-2">
+          <ChartCard
+            title="권한 비율"
+            description="도넛 차트"
+            className="lg:col-span-2"
+          >
             <PieChart data={roleShare} className="h-80" />
           </ChartCard>
         </div>
@@ -946,10 +988,12 @@ export default function StorybookPage() {
               ),
             },
           ]}
-          data={sampleUsers.slice(
-            (tablePage - 1) * tablePageSize,
-            tablePage * tablePageSize,
-          ) as never}
+          data={
+            sampleUsers.slice(
+              (tablePage - 1) * tablePageSize,
+              tablePage * tablePageSize,
+            ) as never
+          }
           onRowClick={(row) => toast(`${(row as User).name} 선택`, "primary")}
           pagination={{
             page: tablePage,
@@ -1019,7 +1063,11 @@ export default function StorybookPage() {
                     }
                     dot
                   >
-                    {v === "active" ? "활성" : v === "pending" ? "대기" : "비활성"}
+                    {v === "active"
+                      ? "활성"
+                      : v === "pending"
+                        ? "대기"
+                        : "비활성"}
                   </Badge>
                 ),
               },

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, HelpCircle, LogOut, MessageSquareText, Palette, Settings, Users } from "lucide-react";
+import { Bell, Building2, Database, HelpCircle, History, LogOut, MessageSquareText, Palette, Settings, UserRound, Users } from "lucide-react";
 import { AuthGuard } from "@/components/auth";
 import { BarChart, ChartCard, LineChart } from "@/components/charts";
 import { Footer, Header, MainLayout, PageWrapper } from "@/components/layout";
@@ -51,11 +51,31 @@ const logColumns = [
 export default function DashboardPage() {
   const sidebarItems = [
     { label: "대시보드", href: ROUTES.DASHBOARD, icon: Settings, exact: true },
-    { label: "사용자 관리", href: ROUTES.USERS.ROOT, icon: Users },
-    { label: "게시판", href: ROUTES.BOARDS, icon: MessageSquareText },
-    { label: "공지사항", href: ROUTES.NOTICES, icon: Bell },
-    { label: "질의", href: ROUTES.INQUIRIES, icon: HelpCircle },
-    { label: "Q&A", href: ROUTES.QNA, icon: MessageSquareText },
+    { label: "마이페이지", href: ROUTES.MY_PAGE, icon: UserRound, exact: true },
+    {
+      label: "사용자 관리",
+      icon: Users,
+      children: [
+        { label: "사용자권한 정보", href: ROUTES.USERS.ROOT, icon: Users, exact: true },
+        { label: "로그인 이력", href: ROUTES.USERS.LOGIN_HISTORY, icon: History },
+        { label: "조직관리", href: ROUTES.ORGANIZATIONS, icon: Building2 },
+      ],
+    },
+    {
+      label: "데이터 관리",
+      icon: Database,
+      children: [{ label: "코드관리", href: ROUTES.DATA_CODES, icon: Database }],
+    },
+    {
+      label: "게시판",
+      icon: MessageSquareText,
+      children: [
+        { label: "게시판", href: ROUTES.BOARDS, icon: MessageSquareText, exact: true },
+        { label: "공지사항", href: ROUTES.NOTICES, icon: Bell },
+        { label: "질의", href: ROUTES.INQUIRIES, icon: HelpCircle },
+        { label: "Q&A", href: ROUTES.QNA, icon: MessageSquareText },
+      ],
+    },
   ];
 
   return (
@@ -112,6 +132,9 @@ export default function DashboardPage() {
                 <Link className="hover:text-primary-600 hover:underline" href={ROUTES.AUTH.SIGNUP}>
                   회원가입
                 </Link>
+                <Link className="hover:text-primary-600 hover:underline" href={ROUTES.MY_PAGE}>
+                  마이페이지
+                </Link>
               </div>
             </div>
           </Footer>
@@ -130,9 +153,12 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-6">
             {[
-              { title: "사용자 관리", description: "가입자와 권한 관리", href: ROUTES.USERS.ROOT, icon: Users },
+              { title: "사용자권한 정보", description: "가입자와 권한 관리", href: ROUTES.USERS.ROOT, icon: Users },
+              { title: "로그인 이력", description: "접속 성공/실패 확인", href: ROUTES.USERS.LOGIN_HISTORY, icon: History },
+              { title: "조직관리", description: "조직코드와 활성 상태", href: ROUTES.ORGANIZATIONS, icon: Building2 },
+              { title: "코드관리", description: "대/중/소 분류 코드", href: ROUTES.DATA_CODES, icon: Database },
               { title: "게시판", description: "일반 게시글 관리", href: ROUTES.BOARDS, icon: MessageSquareText },
               { title: "공지사항", description: "고정 공지 및 운영 안내", href: ROUTES.NOTICES, icon: Bell },
               { title: "질의", description: "문의 접수 및 처리", href: ROUTES.INQUIRIES, icon: HelpCircle },

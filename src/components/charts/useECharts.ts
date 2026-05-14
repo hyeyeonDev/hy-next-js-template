@@ -6,11 +6,23 @@ import type { ECharts, EChartsOption, SetOptionOpts } from "echarts";
 
 import { useTheme } from "@/hooks/useTheme";
 
-import { getChartBaseOption } from "./chart-theme";
+import { getCartesianChartOption, getChartBaseOption } from "./chart-theme";
 
 interface UseEChartsOptions {
   option: EChartsOption;
   setOptionOpts?: SetOptionOpts;
+}
+
+function hasCartesianAxis(option: EChartsOption) {
+  return "xAxis" in option || "yAxis" in option;
+}
+
+function mergeComponentOption(base: unknown, override: unknown) {
+  if (!override) return base;
+  if (Array.isArray(override)) {
+    return override.map((item) => ({ ...(base as object), ...(item as object) }));
+  }
+  return { ...(base as object), ...(override as object) };
 }
 
 export function useECharts({ option, setOptionOpts }: UseEChartsOptions) {
@@ -39,10 +51,20 @@ export function useECharts({ option, setOptionOpts }: UseEChartsOptions) {
   }, []);
 
   useEffect(() => {
+    const baseOption = getChartBaseOption(isDark);
+    const cartesianOption = hasCartesianAxis(option) ? getCartesianChartOption(isDark) : {};
+
     chartRef.current?.setOption(
       {
-        ...getChartBaseOption(isDark),
+        ...baseOption,
+        ...cartesianOption,
         ...option,
+        ...(hasCartesianAxis(option)
+          ? {
+              xAxis: mergeComponentOption(cartesianOption.xAxis, option.xAxis),
+              yAxis: mergeComponentOption(cartesianOption.yAxis, option.yAxis),
+            }
+          : {}),
       },
       setOptionOpts,
     );

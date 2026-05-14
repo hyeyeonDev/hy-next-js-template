@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useContentQuery, useUpdateContentMutation } from "@/hooks/queries";
-import { AuthGuard } from "@/components/auth";
 import { LoadingState } from "@/components/data-display";
+import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useToast } from "@/components/ui/toast";
 import { Card } from "@/components/ui";
 import type { ContentKind } from "@/types";
@@ -26,18 +26,17 @@ export function ContentEditPage({ kind, id }: ContentEditPageProps) {
   const updateContent = useUpdateContentMutation(kind);
 
   return (
-    <AuthGuard>
-      <main className="min-h-screen bg-bg p-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-6">
-            <Link className="text-sm font-medium text-primary-600 hover:underline" href={`${meta.path}/${id}`}>
-              상세보기
-            </Link>
-            <h1 className="mt-2 text-2xl font-bold text-text">수정</h1>
-            <p className="mt-1 text-sm text-text-muted">게시물 정보를 수정합니다.</p>
-          </div>
-
-          {detailQuery.isLoading && <LoadingState message="게시물을 불러오는 중..." />}
+    <AdminLayout title={meta.title}>
+      <PageWrapper
+        title="수정"
+        description="게시물 정보를 수정합니다."
+        breadcrumb={
+          <Link className="text-sm font-medium text-primary-600 hover:underline" href={`${meta.path}/${id}`}>
+            상세보기
+          </Link>
+        }
+      >
+        {detailQuery.isLoading && <LoadingState message="게시물을 불러오는 중..." />}
 
           {detailQuery.isError && (
             <Card>
@@ -65,8 +64,7 @@ export function ContentEditPage({ kind, id }: ContentEditPageProps) {
               />
             </Card>
           )}
-        </div>
-      </main>
-    </AuthGuard>
+      </PageWrapper>
+    </AdminLayout>
   );
 }
