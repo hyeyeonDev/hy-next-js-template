@@ -33,28 +33,91 @@ docs/
 ## Scripts
 
 ```bash
-npm run dev
-npm run build
+npm run dev        # 개발 서버 모드: RELEASED_FEATURES만 노출
+npm run dev:local  # 개인 로컬 모드: 모든 페이지/메뉴 노출
+npm run build      # 운영 빌드
+npm run build:dev  # 개발 서버용 빌드
+npm run start      # 운영 빌드 실행
+npm run start:dev  # 개발 서버용 빌드 실행
 npm run lint
 ```
 
 ## Environment
 
-`.env.example` 기준으로 mock API 사용 여부와 배포 메뉴 노출 범위를 전환합니다.
+Next.js는 프로젝트 루트의 `.env*` 파일을 읽습니다. `/src` 안이 아니라 루트에 두어야 합니다.
 
-```bash
-NEXT_PUBLIC_USE_MOCK_API=true
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
-NEXT_PUBLIC_APP_ENV=local
-APP_ENABLED_FEATURES=dashboard,mypage,notices,inquiries,qna
-NEXT_PUBLIC_ENABLED_FEATURES=dashboard,mypage,notices,inquiries,qna
+```text
+.env              공통 기본값
+.env.local        개인 로컬용 override, git ignore
+.env.development  개발 서버
+.env.production   운영 서버
+.env.example      공유용 예시
 ```
+
+환경별 역할은 다음 기준으로 사용합니다.
+
+- `.env`: 앱 이름처럼 고정된 값과 기본 API URL, mock 기본값처럼 모든 환경에서 공유 가능한 값
+- `.env.local`: 개인 PC에서만 쓰는 값. `NEXT_PUBLIC_APP_ENV=local`이면 모든 메뉴와 페이지가 열림
+- `.env.development`: 개발 서버 값. `RELEASED_FEATURES`에 등록된 기능만 노출
+- `.env.production`: 운영 서버 값. `RELEASED_FEATURES`에 등록된 기능만 노출
+
+`NEXT_PUBLIC_APP_NAME`처럼 환경마다 달라지지 않는 고정값은 `.env`에만 둡니다. 환경별 파일에는 해당 환경에서 달라지는 값만 작성합니다.
+
+카카오맵/GA처럼 환경마다 달라지는 외부 키는 `.env`에 두지 않고 `.env.local`, `.env.development`, `.env.production`에만 작성합니다. Next.js 로딩 순서는 `.env.development`/`.env.production`이 `.env`보다 우선이지만, 공통 파일에는 진짜 공통값만 두는 편이 실수를 줄입니다.
+
+`NEXT_PUBLIC_APP_ENV=local`일 때만 모든 메뉴와 페이지가 열립니다. `development`, `staging`, `production` 등 local이 아닌 환경에서는 `src/lib/feature-flags.ts`의 `RELEASED_FEATURES`에 등록한 기능만 메뉴에 노출하며, 직접 URL 접근도 `src/proxy.ts`에서 404로 차단합니다.
 
 `NEXT_PUBLIC_USE_MOCK_API=false`로 바꾸면 `src/lib/axios.ts`의 fetch client가 실제 API base URL을 사용합니다.
 
-`NEXT_PUBLIC_APP_ENV=local` 또는 개발 서버(`NODE_ENV=development`)에서는 모든 메뉴와 페이지가 열립니다. 배포 환경에서는 `NEXT_PUBLIC_APP_ENV=production`으로 두고 `APP_ENABLED_FEATURES`에 등록한 기능만 `src/proxy.ts`에서 접근 허용합니다. `NEXT_PUBLIC_ENABLED_FEATURES`는 사이드바와 바로가기 메뉴 노출용이며, 보통 `APP_ENABLED_FEATURES`와 같은 값으로 맞춥니다.
-
 사용 가능한 feature key는 `dashboard`, `mypage`, `user-permissions`, `login-history`, `organizations`, `data-codes`, `notices`, `inquiries`, `qna`, `storybook`, `error-preview`입니다.
+
+### 실행 방법
+
+개인 로컬 개발은 모든 페이지를 열어두고 확인합니다.
+
+```bash
+npm run dev:local
+```
+
+개발 서버와 같은 제한 조건으로 로컬에서 확인하려면 다음 명령을 사용합니다. `.env.local`이 있어도 스크립트의 `NEXT_PUBLIC_APP_ENV=development`가 우선 적용됩니다.
+
+```bash
+npm run dev
+```
+
+운영 빌드를 로컬에서 검증하려면 다음 순서로 실행합니다.
+
+```bash
+npm run build
+npm run start
+```
+
+개발 서버용 빌드를 검증하려면 다음 순서로 실행합니다.
+
+```bash
+npm run build:dev
+npm run start:dev
+```
+
+### 배포 방식
+
+개발 서버 배포:
+
+```bash
+npm ci
+npm run build:dev
+npm run start:dev
+```
+
+운영 서버 배포:
+
+```bash
+npm ci
+npm run build
+npm run start
+```
+
+Vercel 같은 플랫폼을 사용한다면 환경별 Variables에 `.env.development` 또는 `.env.production`의 값을 등록하고, 빌드 명령은 개발 서버는 `npm run build:dev`, 운영 서버는 `npm run build`로 지정합니다. `NEXT_PUBLIC_` 변수는 빌드 시점에 브라우저 번들에 고정되므로, 환경별 값이 필요한 경우 반드시 해당 환경에서 다시 빌드해야 합니다.
 
 ## Routes
 

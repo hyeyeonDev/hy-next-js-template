@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { getSafeReturnPath } from "@/lib/auth-redirect";
 import { isRouteFeatureEnabled } from "@/lib/feature-flags";
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/logout", "/find-id", "/find-password", "/storybook", "/error-preview"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/logout", "/find-id", "/find-password", "/storybook", "/error-preview", "/not-found"];
 
 function isPublicRoute(pathname: string) {
   return PUBLIC_ROUTES.some((route) => pathname === route || (route !== "/" && pathname.startsWith(`${route}/`)));
@@ -14,7 +14,7 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   if (!isRouteFeatureEnabled(pathname)) {
-    return new NextResponse("Not Found", { status: 404 });
+    return NextResponse.rewrite(new URL("/not-found", request.url), { status: 404 });
   }
 
   const isProtected = !isPublicRoute(pathname);
