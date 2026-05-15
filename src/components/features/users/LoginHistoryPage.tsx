@@ -55,7 +55,7 @@ export function LoginHistoryPage() {
   return (
     <AdminLayout title="로그인 이력">
       <RoleGuard
-        roles={["admin"]}
+        roles={["ADMIN"]}
         fallback={
           <Card className="mx-auto max-w-xl text-center">
             <Shield className="mx-auto h-8 w-8 text-danger-500" aria-hidden="true" />

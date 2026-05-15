@@ -26,7 +26,7 @@ export function UserEditPage({ id }: UserEditPageProps) {
   return (
     <AdminLayout title="사용자권한 정보">
       <RoleGuard
-        roles={["admin"]}
+        roles={["ADMIN"]}
         fallback={
           <Card className="mx-auto max-w-xl text-center">
             <h1 className="text-lg font-semibold text-text">수정 권한이 없습니다</h1>

@@ -1,5 +1,6 @@
 "use client";
 import { useMeQuery } from "@/hooks/queries";
+import { isAdminRole, isManagerRole } from "@/lib/roles";
 
 export function useAuth() {
   const { data: user, isLoading, error } = useMeQuery();
@@ -8,7 +9,7 @@ export function useAuth() {
     user,
     isLoading,
     isAuthenticated: !!user && !error,
-    isAdmin: user?.role === "admin",
-    isManager: user?.role === "manager",
+    isAdmin: isAdminRole(user?.role),
+    isManager: isManagerRole(user?.role),
   };
 }

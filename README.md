@@ -127,6 +127,7 @@ Vercel 같은 플랫폼을 사용한다면 환경별 Variables에 `.env.developm
 - `/signup`: 회원가입
 - `/logout`: 로그아웃 처리
 - `/dashboard`: 보호 라우트 예시
+- `/digital-map`: 독립형 지도 화면, 메뉴에서 새 창으로 열림
 - `/mypage`: 내 정보 확인/수정
 - `/users`: 사용자권한 정보
 - `/users/login-history`: 로그인 이력관리

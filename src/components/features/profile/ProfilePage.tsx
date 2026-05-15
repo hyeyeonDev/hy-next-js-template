@@ -3,24 +3,22 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LogOut, Palette, Settings } from "lucide-react";
+import { Palette, Settings } from "lucide-react";
 
 import { AuthGuard } from "@/components/auth";
 import { LoadingState } from "@/components/data-display";
 import { FormField, PhoneField } from "@/components/forms";
-import { Footer, Header, MainLayout, PageWrapper } from "@/components/layout";
+import { Footer, Header, MainLayout, PageWrapper, UserAccountMenu } from "@/components/layout";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { getAdminSidebarItems, isStorybookMenuEnabled } from "@/components/layout/admin-navigation";
 import { Badge, Button, Card, Input } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
 import { ROUTES } from "@/constants/routes";
 import { useMeQuery, useUpdateMeMutation, useWithdrawMeMutation } from "@/hooks/queries";
+import { useI18n } from "@/i18n";
+import { isAdminRole } from "@/lib/roles";
 import type { AuthUser } from "@/types";
-
-const roleLabel = {
-  admin: "관리자",
-  manager: "매니저",
-  user: "사용자",
-};
+import { userRoleLabel } from "@/components/features/users/user-meta";
 
 function statusVariant(status: AuthUser["status"]) {
   if (status === "active") return "success";
@@ -29,9 +27,16 @@ function statusVariant(status: AuthUser["status"]) {
   return "secondary";
 }
 
+function roleVariant(role: AuthUser["role"]) {
+  if (isAdminRole(role)) return "danger";
+  if (role === "MANAGER") return "warning";
+  return "secondary";
+}
+
 export function ProfilePage() {
+  const { t } = useI18n();
   const meQuery = useMeQuery();
-  const sidebarItems = getAdminSidebarItems();
+  const sidebarItems = getAdminSidebarItems(t);
 
   return (
     <AuthGuard>
@@ -50,28 +55,25 @@ export function ProfilePage() {
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-primary-600 transition-colors hover:bg-primary-50"
             >
               <Palette className="h-4 w-4" aria-hidden="true" />
-              컴포넌트 보기
+              {t("nav.components")}
             </Link>
           ) : null,
         }}
         topbar={
           <Header
-            title="마이페이지"
+            title={t("profile.title")}
             actions={
-              <Link
-                href={ROUTES.AUTH.LOGOUT}
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-border bg-surface px-3 text-sm font-medium text-text transition-colors hover:bg-surface-2"
-              >
-                <LogOut className="h-4 w-4" aria-hidden="true" />
-                로그아웃
-              </Link>
+              <>
+                <LanguageSwitcher />
+                <UserAccountMenu />
+              </>
             }
           />
         }
         footer={<Footer />}
       >
-        <PageWrapper title="마이페이지" description="내 계정 정보를 확인하고 기본 프로필을 수정합니다.">
-          {meQuery.isLoading && <LoadingState message="내 정보를 불러오는 중..." />}
+        <PageWrapper title={t("profile.title")} description={t("profile.description")}>
+          {meQuery.isLoading && <LoadingState message={t("profile.loading")} />}
 
           {meQuery.isError && (
             <Card>
@@ -89,9 +91,7 @@ export function ProfilePage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-xl font-semibold text-text">{meQuery.data.name}</h2>
-                      <Badge variant={meQuery.data.role === "admin" ? "danger" : meQuery.data.role === "manager" ? "warning" : "secondary"}>
-                        {roleLabel[meQuery.data.role]}
-                      </Badge>
+                      <Badge variant={roleVariant(meQuery.data.role)}>{userRoleLabel[meQuery.data.role]}</Badge>
                       <Badge variant={statusVariant(meQuery.data.status)} dot>
                         {meQuery.data.status === "active"
                           ? "활성"

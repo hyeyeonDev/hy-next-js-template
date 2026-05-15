@@ -1,4 +1,7 @@
 import type { ContentKind, ContentStatus } from "@/types";
+import type { TranslationKey } from "@/i18n";
+
+type Translator = (key: TranslationKey) => string;
 
 export const contentMeta = {
   notice: {
@@ -33,3 +36,42 @@ export const statusLabel = {
   answered: "답변완료",
   closed: "종료",
 } satisfies Record<ContentStatus, string>;
+
+export function getContentMeta(kind: ContentKind, t: Translator) {
+  const meta = contentMeta[kind];
+  const keyMap = {
+    notice: {
+      title: "content.notice.title",
+      description: "content.notice.description",
+      createLabel: "content.notice.create",
+    },
+    inquiry: {
+      title: "content.inquiry.title",
+      description: "content.inquiry.description",
+      createLabel: "content.inquiry.create",
+    },
+    qna: {
+      title: "content.qna.title",
+      description: "content.qna.description",
+      createLabel: "content.qna.create",
+    },
+  } satisfies Record<ContentKind, { title: TranslationKey; description: TranslationKey; createLabel: TranslationKey }>;
+
+  return {
+    ...meta,
+    title: t(keyMap[kind].title),
+    description: t(keyMap[kind].description),
+    createLabel: t(keyMap[kind].createLabel),
+  };
+}
+
+export function getContentStatusLabel(status: ContentStatus, t: Translator) {
+  const keyMap = {
+    draft: "content.status.draft",
+    published: "content.status.published",
+    answered: "content.status.answered",
+    closed: "content.status.closed",
+  } satisfies Record<ContentStatus, TranslationKey>;
+
+  return t(keyMap[status]);
+}

@@ -50,7 +50,7 @@ export function OrganizationPage() {
   return (
     <AdminLayout title="조직관리">
       <RoleGuard
-        roles={["admin"]}
+        roles={["ADMIN"]}
         fallback={
           <Card className="mx-auto max-w-xl text-center">
             <Shield className="mx-auto h-8 w-8 text-danger-500" aria-hidden="true" />

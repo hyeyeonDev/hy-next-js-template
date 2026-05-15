@@ -1,9 +1,10 @@
 import type { UserRole, UserStatus } from "@/types";
 
 export const userRoleLabel = {
-  admin: "관리자",
-  manager: "매니저",
-  user: "사용자",
+  SUPER_ADMIN: "최고관리자",
+  ADMIN: "관리자",
+  MANAGER: "매니저",
+  USER: "사용자",
 } satisfies Record<UserRole, string>;
 
 export const userStatusLabel = {

@@ -11,6 +11,7 @@ import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
+import { isAdminRole } from "@/lib/roles";
 
 import { userRoleLabel, userStatusLabel } from "./user-meta";
 
@@ -27,7 +28,7 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
 
   return (
     <AdminLayout title="사용자권한 정보">
-      <RoleGuard roles={["admin", "manager"]}>
+      <RoleGuard roles={["ADMIN", "MANAGER"]}>
         <PageWrapper
           title="사용자 상세"
           description="가입된 사용자 정보를 확인합니다."
@@ -37,7 +38,7 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
             </Link>
           }
           actions={
-            <RoleGuard roles={["admin"]}>
+            <RoleGuard roles={["ADMIN"]}>
               <div className="flex gap-2">
                 <Link
                   href={ROUTES.USERS.EDIT(id)}
@@ -102,7 +103,7 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-xl font-semibold text-text">{userQuery.data.name}</h2>
-                      <Badge variant={userQuery.data.role === "admin" ? "danger" : userQuery.data.role === "manager" ? "warning" : "secondary"}>
+                      <Badge variant={isAdminRole(userQuery.data.role) ? "danger" : userQuery.data.role === "MANAGER" ? "warning" : "secondary"}>
                         {userRoleLabel[userQuery.data.role]}
                       </Badge>
                       <Badge

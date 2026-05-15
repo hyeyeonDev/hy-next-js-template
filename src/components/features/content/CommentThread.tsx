@@ -10,9 +10,11 @@ import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from "@/hooks/queries";
+import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/data-display";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card, Textarea } from "@/components/ui";
+import { isAdminRole } from "@/lib/roles";
 import type { ContentComment, ContentKind } from "@/types";
 
 interface CommentThreadProps {
@@ -23,6 +25,7 @@ interface CommentThreadProps {
 
 export function CommentThread({ kind, contentId, allowReplies = true }: CommentThreadProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const commentsQuery = useCommentsQuery(kind, contentId);
   const createComment = useCreateCommentMutation(kind, contentId);
   const createReply = useCreateCommentReplyMutation(kind, contentId);
@@ -114,6 +117,8 @@ export function CommentThread({ kind, contentId, allowReplies = true }: CommentT
             loadingReply={createReply.isPending}
             loadingEdit={updateComment.isPending}
             loadingDelete={deleteComment.isPending}
+            currentUserId={user?.id}
+            isAdmin={isAdminRole(user?.role)}
             onStartReply={(id) => {
               setReplyTargetId(id);
               setReplyContent("");
@@ -161,6 +166,8 @@ interface CommentItemProps {
   loadingReply: boolean;
   loadingEdit: boolean;
   loadingDelete: boolean;
+  currentUserId?: number;
+  isAdmin: boolean;
   onStartReply: (id: number) => void;
   onCancelReply: () => void;
   onChangeReply: (value: string) => void;
@@ -182,6 +189,8 @@ function CommentItem({
   loadingReply,
   loadingEdit,
   loadingDelete,
+  currentUserId,
+  isAdmin,
   onStartReply,
   onCancelReply,
   onChangeReply,
@@ -194,6 +203,7 @@ function CommentItem({
 }: CommentItemProps) {
   const isEditing = editingId === comment.id;
   const isReplying = replyTargetId === comment.id;
+  const canManage = comment.authorId === currentUserId || isAdmin;
 
   return (
     <div className="rounded-lg border border-border bg-surface p-4">
@@ -210,18 +220,22 @@ function CommentItem({
               답글
             </Button>
           )}
-          <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(comment)}>
-            수정
-          </Button>
-          <Button
-            size="xs"
-            variant="ghost"
-            leftIcon={<Trash2 aria-hidden="true" />}
-            loading={loadingDelete}
-            onClick={() => onDelete(comment.id)}
-          >
-            삭제
-          </Button>
+          {canManage && (
+            <>
+              <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(comment)}>
+                수정
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
+                leftIcon={<Trash2 aria-hidden="true" />}
+                loading={loadingDelete}
+                onClick={() => onDelete(comment.id)}
+              >
+                삭제
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -271,20 +285,22 @@ function CommentItem({
                     {new Date(reply.createdAt).toLocaleString("ko-KR")}
                   </p>
                 </div>
-                <div className="flex shrink-0 gap-1">
-                  <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(reply)}>
-                    수정
-                  </Button>
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    leftIcon={<Trash2 aria-hidden="true" />}
-                    loading={loadingDelete}
-                    onClick={() => onDelete(reply.id)}
-                  >
-                    삭제
-                  </Button>
-                </div>
+                {(reply.authorId === currentUserId || isAdmin) && (
+                  <div className="flex shrink-0 gap-1">
+                    <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(reply)}>
+                      수정
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      leftIcon={<Trash2 aria-hidden="true" />}
+                      loading={loadingDelete}
+                      onClick={() => onDelete(reply.id)}
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                )}
               </div>
               {editingId === reply.id ? (
                 <div className="mt-3 space-y-2">

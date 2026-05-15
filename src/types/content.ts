@@ -6,6 +6,7 @@ export interface ContentItem {
   kind: ContentKind;
   title: string;
   content: string;
+  authorId: number;
   authorName: string;
   status: ContentStatus;
   category?: string;

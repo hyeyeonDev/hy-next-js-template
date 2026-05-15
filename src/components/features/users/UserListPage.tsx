@@ -12,6 +12,7 @@ import { Badge, Button, Card } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
 import { useUsersQuery, useWithdrawUserMutation } from "@/hooks/queries";
 import { ROUTES } from "@/constants/routes";
+import { isAdminRole } from "@/lib/roles";
 import type { TableColumn, User } from "@/types";
 
 import { userRoleLabel, userStatusLabel } from "./user-meta";
@@ -20,8 +21,8 @@ const actionLinkClass =
   "inline-flex h-7 items-center justify-center gap-1 rounded-md px-2.5 text-xs font-medium text-text transition-colors hover:bg-surface-2";
 
 function roleVariant(role: User["role"]) {
-  if (role === "admin") return "danger";
-  if (role === "manager") return "warning";
+  if (isAdminRole(role)) return "danger";
+  if (role === "MANAGER") return "warning";
   return "secondary";
 }
 
@@ -87,7 +88,7 @@ export function UserListPage() {
               <Eye className="h-3.5 w-3.5" aria-hidden="true" />
               보기
             </Link>
-            <RoleGuard roles={["admin"]}>
+            <RoleGuard roles={["ADMIN"]}>
               <Link className={actionLinkClass} href={ROUTES.USERS.EDIT(row.id)}>
                 <Edit className="h-3.5 w-3.5" aria-hidden="true" />
                 수정
@@ -124,7 +125,7 @@ export function UserListPage() {
   return (
     <AdminLayout title="사용자권한 정보">
       <RoleGuard
-        roles={["admin", "manager"]}
+        roles={["ADMIN", "MANAGER"]}
         fallback={
           <Card className="mx-auto max-w-xl text-center">
             <Shield className="mx-auto h-8 w-8 text-danger-500" aria-hidden="true" />

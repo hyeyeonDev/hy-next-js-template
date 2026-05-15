@@ -8,6 +8,7 @@ import type {
 
 import { fail, getId, ok, page, type MockRequest } from "../mock-utils";
 import { mockStore } from "../mock-store";
+import { isAdminRole } from "@/lib/roles";
 
 function getContentKind(path: string): ContentKind | null {
   if (path.startsWith("/notices")) return "notice";
@@ -53,6 +54,7 @@ function createContent(kind: ContentKind, dto: CreateContentDto) {
     kind,
     title: dto.title,
     content: dto.content,
+    authorId: mockStore.currentUser.id,
     authorName: mockStore.currentUser.name,
     status: dto.status ?? "published",
     category: dto.category,
@@ -69,6 +71,9 @@ function createContent(kind: ContentKind, dto: CreateContentDto) {
 function updateContent(kind: ContentKind, id: number, dto: UpdateContentDto) {
   const target = mockStore.contents.find((item) => item.kind === kind && item.id === id);
   if (!target) fail(404, "게시물을 찾을 수 없습니다.");
+  if (target.authorId !== mockStore.currentUser.id && !isAdminRole(mockStore.currentUser.role)) {
+    fail(403, "게시물 수정 권한이 없습니다.");
+  }
 
   const updated = { ...target, ...dto, updatedAt: new Date().toISOString() };
   mockStore.contents = mockStore.contents.map((item) => (item.id === id ? updated : item));
@@ -76,8 +81,11 @@ function updateContent(kind: ContentKind, id: number, dto: UpdateContentDto) {
 }
 
 function deleteContent(kind: ContentKind, id: number) {
-  const exists = mockStore.contents.some((item) => item.kind === kind && item.id === id);
-  if (!exists) fail(404, "게시물을 찾을 수 없습니다.");
+  const target = mockStore.contents.find((item) => item.kind === kind && item.id === id);
+  if (!target) fail(404, "게시물을 찾을 수 없습니다.");
+  if (target.authorId !== mockStore.currentUser.id && !isAdminRole(mockStore.currentUser.role)) {
+    fail(403, "게시물 삭제 권한이 없습니다.");
+  }
 
   mockStore.contents = mockStore.contents.filter((item) => !(item.kind === kind && item.id === id));
   return ok(null, "게시물이 삭제되었습니다.");

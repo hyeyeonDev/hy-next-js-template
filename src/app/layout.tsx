@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { DialogProvider } from "@/components/ui/dialog";
 import { ReactQueryProvider } from "@/lib/react-query";
+import { I18nProvider } from "@/i18n";
 
 export const metadata: Metadata = {
   title: "프로젝트 템플릿",
@@ -34,9 +35,11 @@ export default function RootLayout({
       </head>
       <body>
         <ReactQueryProvider>
-          <ToastProvider>
-            <DialogProvider>{children}</DialogProvider>
-          </ToastProvider>
+          <I18nProvider>
+            <ToastProvider>
+              <DialogProvider>{children}</DialogProvider>
+            </ToastProvider>
+          </I18nProvider>
         </ReactQueryProvider>
       </body>
     </html>

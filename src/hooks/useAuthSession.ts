@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { useLoginMutation, useLogoutMutation, useMeQuery, useSignupMutation } from "@/hooks/queries";
 import { useAuthStore } from "@/store";
 import { getSafeReturnPath } from "@/lib/auth-redirect";
+import { isAdminRole, isManagerRole } from "@/lib/roles";
 
 export function useAuthSession() {
   const meQuery = useMeQuery();
@@ -25,8 +26,8 @@ export function useAuthSession() {
     user: meQuery.data,
     isLoading: meQuery.isLoading,
     isAuthenticated: !!meQuery.data && !meQuery.error,
-    isAdmin: meQuery.data?.role === "admin",
-    isManager: meQuery.data?.role === "manager",
+    isAdmin: isAdminRole(meQuery.data?.role),
+    isManager: isManagerRole(meQuery.data?.role),
     returnTo,
     setReturnTo,
     markLoggedIn,

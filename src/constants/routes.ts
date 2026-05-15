@@ -12,6 +12,7 @@ export const ROUTES = {
   },
 
   DASHBOARD: "/dashboard",
+  DIGITAL_MAP: "/digital-map",
   MY_PAGE: "/mypage",
   ORGANIZATIONS: "/organizations",
   DATA_CODES: "/data/codes",

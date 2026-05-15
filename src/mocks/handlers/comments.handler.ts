@@ -2,6 +2,7 @@ import type { ContentComment, ContentKind, CreateCommentDto, UpdateCommentDto } 
 
 import { fail, getId, ok, type MockRequest } from "../mock-utils";
 import { mockStore } from "../mock-store";
+import { isAdminRole } from "@/lib/roles";
 
 function getContentKind(path: string): ContentKind | null {
   if (path.startsWith("/notices")) return "notice";
@@ -63,6 +64,9 @@ function createComment(contentId: number, dto: CreateCommentDto, parentId?: numb
 function updateComment(commentId: number, dto: UpdateCommentDto) {
   const target = mockStore.comments.find((comment) => comment.id === commentId);
   if (!target) fail(404, "댓글을 찾을 수 없습니다.");
+  if (target.authorId !== mockStore.currentUser.id && !isAdminRole(mockStore.currentUser.role)) {
+    fail(403, "댓글 수정 권한이 없습니다.");
+  }
 
   const updated = { ...target, content: dto.content, updatedAt: new Date().toISOString() };
   mockStore.comments = mockStore.comments.map((comment) => (comment.id === commentId ? updated : comment));
@@ -70,8 +74,11 @@ function updateComment(commentId: number, dto: UpdateCommentDto) {
 }
 
 function deleteComment(commentId: number) {
-  const exists = mockStore.comments.some((comment) => comment.id === commentId);
-  if (!exists) fail(404, "댓글을 찾을 수 없습니다.");
+  const target = mockStore.comments.find((comment) => comment.id === commentId);
+  if (!target) fail(404, "댓글을 찾을 수 없습니다.");
+  if (target.authorId !== mockStore.currentUser.id && !isAdminRole(mockStore.currentUser.role)) {
+    fail(403, "댓글 삭제 권한이 없습니다.");
+  }
 
   mockStore.comments = mockStore.comments.filter((comment) => comment.id !== commentId && comment.parentId !== commentId);
   return ok(null, "댓글이 삭제되었습니다.");

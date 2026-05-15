@@ -784,8 +784,8 @@ export default function StorybookPage() {
             <Select
               placeholder="선택"
               options={[
-                { label: "관리자", value: "admin" },
-                { label: "일반", value: "user" },
+                { label: "관리자", value: "ADMIN" },
+                { label: "일반", value: "USER" },
               ]}
             />
           </FormField>

@@ -44,9 +44,10 @@ export function UserForm({ user, loading, canEditRole = false, onSubmit }: UserF
             disabled={!canEditRole}
             onChange={(event) => setRole(event.target.value as UserRole)}
             options={[
-              { label: userRoleLabel.admin, value: "admin" },
-              { label: userRoleLabel.manager, value: "manager" },
-              { label: userRoleLabel.user, value: "user" },
+              { label: userRoleLabel.SUPER_ADMIN, value: "SUPER_ADMIN" },
+              { label: userRoleLabel.ADMIN, value: "ADMIN" },
+              { label: userRoleLabel.MANAGER, value: "MANAGER" },
+              { label: userRoleLabel.USER, value: "USER" },
             ]}
           />
         </FormField>

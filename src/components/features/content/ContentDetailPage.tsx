@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation";
 import { Edit, Trash2 } from "lucide-react";
 
 import { useContentQuery, useDeleteContentMutation } from "@/hooks/queries";
+import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/data-display";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card } from "@/components/ui";
+import { useI18n } from "@/i18n";
+import { isAdminRole } from "@/lib/roles";
 import type { ContentKind } from "@/types";
 
 import { CommentThread } from "./CommentThread";
-import { contentMeta, statusLabel } from "./content-meta";
+import { getContentMeta, getContentStatusLabel } from "./content-meta";
 
 interface ContentDetailPageProps {
   kind: ContentKind;
@@ -20,30 +23,33 @@ interface ContentDetailPageProps {
 }
 
 export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
-  const meta = contentMeta[kind];
+  const { t, locale } = useI18n();
+  const meta = getContentMeta(kind, t);
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useAuth();
   const detailQuery = useContentQuery(kind, id);
   const deleteContent = useDeleteContentMutation(kind);
+  const canManage = !!detailQuery.data && (detailQuery.data.authorId === user?.id || isAdminRole(user?.role));
 
   return (
     <AdminLayout title={meta.title}>
       <PageWrapper
-        title="상세보기"
-        description="게시물 내용을 확인합니다."
+        title={t("common.detail")}
+        description={t("content.detailDescription")}
         breadcrumb={
           <Link className="text-sm font-medium text-primary-600 hover:underline" href={meta.path}>
             {meta.title}
           </Link>
         }
-        actions={
+        actions={canManage ? (
           <>
             <Link
               href={`${meta.path}/${id}/edit`}
               className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-medium text-white transition-colors hover:bg-primary-700"
             >
               <Edit className="h-4 w-4" aria-hidden="true" />
-              수정
+              {t("common.edit")}
             </Link>
             <Button
               variant="danger"
@@ -58,13 +64,13 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                 });
               }}
             >
-              삭제
+              {t("common.delete")}
             </Button>
           </>
-        }
+        ) : null}
       >
 
-          {detailQuery.isLoading && <LoadingState message="게시물을 불러오는 중..." />}
+          {detailQuery.isLoading && <LoadingState message={t("common.loadingContent")} />}
 
           {detailQuery.isError && (
             <Card>
@@ -87,15 +93,15 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                             : "success"
                       }
                     >
-                      {statusLabel[detailQuery.data.status]}
+                      {getContentStatusLabel(detailQuery.data.status, t)}
                     </Badge>
-                    {detailQuery.data.isPinned && <Badge variant="primary">상단 고정</Badge>}
+                    {detailQuery.data.isPinned && <Badge variant="primary">{t("content.pinned")}</Badge>}
                   </div>
                   <h2 className="text-xl font-semibold text-text">{detailQuery.data.title}</h2>
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
-                    <span>작성자 {detailQuery.data.authorName}</span>
-                    <span>조회 {detailQuery.data.viewCount.toLocaleString()}</span>
-                    <span>작성일 {new Date(detailQuery.data.createdAt).toLocaleDateString("ko-KR")}</span>
+                    <span>{t("content.writer")} {detailQuery.data.authorName}</span>
+                    <span>{t("table.views")} {detailQuery.data.viewCount.toLocaleString()}</span>
+                    <span>{t("content.createdAt")} {new Date(detailQuery.data.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "ko-KR")}</span>
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap py-6 text-sm leading-7 text-text">{detailQuery.data.content}</div>

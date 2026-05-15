@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Palette, Settings } from "lucide-react";
+import { Palette, Settings } from "lucide-react";
 
 import { AuthGuard } from "@/components/auth";
 import { ROUTES } from "@/constants/routes";
+import { useI18n } from "@/i18n";
 
 import { getAdminSidebarItems, isStorybookMenuEnabled } from "./admin-navigation";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MainLayout } from "./MainLayout";
+import { UserAccountMenu } from "./UserAccountMenu";
 
 interface AdminLayoutProps {
   title: string;
@@ -18,7 +21,8 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ title, children, actions }: AdminLayoutProps) {
-  const sidebarItems = getAdminSidebarItems();
+  const { t } = useI18n();
+  const sidebarItems = getAdminSidebarItems(t);
 
   return (
     <AuthGuard>
@@ -37,7 +41,7 @@ export function AdminLayout({ title, children, actions }: AdminLayoutProps) {
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-primary-600 transition-colors hover:bg-primary-50"
             >
               <Palette className="h-4 w-4" aria-hidden="true" />
-              컴포넌트 보기
+              {t("nav.components")}
             </Link>
           ) : null,
         }}
@@ -46,14 +50,9 @@ export function AdminLayout({ title, children, actions }: AdminLayoutProps) {
             title={title}
             actions={
               <>
+                <LanguageSwitcher />
                 {actions}
-                <Link
-                  href={ROUTES.AUTH.LOGOUT}
-                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-border bg-surface px-3 text-sm font-medium text-text transition-colors hover:bg-surface-2"
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  로그아웃
-                </Link>
+                <UserAccountMenu />
               </>
             }
           />

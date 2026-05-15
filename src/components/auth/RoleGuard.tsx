@@ -2,6 +2,7 @@
 
 import type { UserRole } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
+import { isAdminRole } from "@/lib/roles";
 
 interface RoleGuardProps {
   roles: UserRole[];
@@ -12,7 +13,9 @@ interface RoleGuardProps {
 export function RoleGuard({ roles, fallback = null, children }: RoleGuardProps) {
   const { user } = useAuth();
 
-  if (!user || !roles.includes(user.role as UserRole)) {
+  const allowed = !!user && (roles.includes(user.role as UserRole) || (roles.includes("ADMIN") && isAdminRole(user.role)));
+
+  if (!allowed) {
     return fallback;
   }
 

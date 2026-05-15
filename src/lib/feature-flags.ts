@@ -2,6 +2,7 @@ import { env } from "./env";
 
 export const FEATURE_KEYS = {
   DASHBOARD: "dashboard",
+  DIGITAL_MAP: "digital-map",
   MY_PAGE: "mypage",
   USER_PERMISSIONS: "user-permissions",
   LOGIN_HISTORY: "login-history",
@@ -25,6 +26,7 @@ export type FeatureKey = (typeof FEATURE_KEYS)[keyof typeof FEATURE_KEYS];
  */
 const RELEASED_FEATURES = new Set<FeatureKey>([
   FEATURE_KEYS.DASHBOARD,
+  FEATURE_KEYS.DIGITAL_MAP,
   FEATURE_KEYS.MY_PAGE,
   FEATURE_KEYS.NOTICES,
   FEATURE_KEYS.INQUIRIES,
@@ -51,6 +53,7 @@ const FEATURE_ROUTE_RULES: Array<{ key: FeatureKey; paths: string[] }> = [
   { key: FEATURE_KEYS.INQUIRIES, paths: ["/boards/inquiries"] },
   { key: FEATURE_KEYS.QNA, paths: ["/boards/qna"] },
   { key: FEATURE_KEYS.DASHBOARD, paths: ["/dashboard"] },
+  { key: FEATURE_KEYS.DIGITAL_MAP, paths: ["/digital-map"] },
   { key: FEATURE_KEYS.MY_PAGE, paths: ["/mypage"] },
   { key: FEATURE_KEYS.STORYBOOK, paths: ["/storybook"] },
   { key: FEATURE_KEYS.ERROR_PREVIEW, paths: ["/error-preview"] },

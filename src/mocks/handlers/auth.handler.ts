@@ -50,7 +50,7 @@ function signup(body: unknown) {
     id: Math.max(0, ...mockStore.users.map((item) => item.id)) + 1,
     name: dto.name,
     email: dto.email,
-    role: "user",
+    role: "USER",
     status: "active",
     createdAt: now,
     updatedAt: now,

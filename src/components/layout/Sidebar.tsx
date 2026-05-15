@@ -12,6 +12,12 @@ export interface SidebarItem {
   icon?: React.ComponentType<{ className?: string }>;
   badge?: string | number;
   exact?: boolean;
+  target?: React.HTMLAttributeAnchorTarget;
+  rel?: string;
+  popup?: {
+    width: number;
+    height: number;
+  };
   children?: SidebarItem[];
 }
 
@@ -85,6 +91,23 @@ function SidebarLink({ item, pathname }: { item: SidebarItem; pathname: string }
   return (
     <Link
       href={item.href}
+      target={item.target}
+      rel={item.rel}
+      onClick={(event) => {
+        if (!item.popup) return;
+
+        event.preventDefault();
+        const width = item.popup.width;
+        const height = item.popup.height;
+        const left = Math.max(0, window.screenX + (window.outerWidth - width) / 2);
+        const top = Math.max(0, window.screenY + (window.outerHeight - height) / 2);
+
+        window.open(
+          item.href,
+          "digital-map",
+          `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no`,
+        );
+      }}
       className={cn(
         "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
         isActive ? "bg-primary-50 font-medium text-primary-700" : "text-text-muted hover:bg-surface-2 hover:text-text",

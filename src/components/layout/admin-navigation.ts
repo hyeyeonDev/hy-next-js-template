@@ -4,6 +4,7 @@ import {
   Database,
   HelpCircle,
   History,
+  Map,
   MessageSquareText,
   Settings,
   UserRound,
@@ -12,6 +13,7 @@ import {
 
 import { ROUTES } from "@/constants/routes";
 import { FEATURE_KEYS, isFeatureEnabled } from "@/lib/feature-flags";
+import type { TranslationKey } from "@/i18n";
 
 import type { SidebarItem } from "./Sidebar";
 
@@ -22,6 +24,7 @@ export interface AdminQuickLink {
   description: string;
   href: string;
   icon: NonNullable<SidebarItem["icon"]>;
+  popup?: SidebarItem["popup"];
 }
 
 function compactItems(items: MaybeSidebarItem[]) {
@@ -39,66 +42,80 @@ function groupItem(label: string, icon: NonNullable<SidebarItem["icon"]>, childr
   };
 }
 
-export function getAdminSidebarItems(): SidebarItem[] {
+type Translator = (key: TranslationKey) => string;
+
+export function getAdminSidebarItems(t: Translator): SidebarItem[] {
   return compactItems([
     isFeatureEnabled(FEATURE_KEYS.DASHBOARD)
-      ? { label: "대시보드", href: ROUTES.DASHBOARD, icon: Settings, exact: true }
+      ? { label: t("nav.dashboard"), href: ROUTES.DASHBOARD, icon: Settings, exact: true }
+      : null,
+    isFeatureEnabled(FEATURE_KEYS.DIGITAL_MAP)
+      ? { label: t("nav.digitalMap"), href: ROUTES.DIGITAL_MAP, icon: Map, popup: { width: 1280, height: 820 } }
       : null,
     isFeatureEnabled(FEATURE_KEYS.MY_PAGE)
-      ? { label: "마이페이지", href: ROUTES.MY_PAGE, icon: UserRound, exact: true }
+      ? { label: t("nav.myPage"), href: ROUTES.MY_PAGE, icon: UserRound, exact: true }
       : null,
-    groupItem("사용자 관리", Users, [
+    groupItem(t("nav.userManagement"), Users, [
       isFeatureEnabled(FEATURE_KEYS.USER_PERMISSIONS)
-        ? { label: "사용자권한 정보", href: ROUTES.USERS.ROOT, icon: Users, exact: true }
+        ? { label: t("nav.userPermissions"), href: ROUTES.USERS.ROOT, icon: Users, exact: true }
         : null,
       isFeatureEnabled(FEATURE_KEYS.LOGIN_HISTORY)
-        ? { label: "로그인 이력", href: ROUTES.USERS.LOGIN_HISTORY, icon: History }
+        ? { label: t("nav.loginHistory"), href: ROUTES.USERS.LOGIN_HISTORY, icon: History }
         : null,
       isFeatureEnabled(FEATURE_KEYS.ORGANIZATIONS)
-        ? { label: "조직관리", href: ROUTES.ORGANIZATIONS, icon: Building2 }
+        ? { label: t("nav.organizations"), href: ROUTES.ORGANIZATIONS, icon: Building2 }
         : null,
     ]),
-    groupItem("데이터 관리", Database, [
+    groupItem(t("nav.dataManagement"), Database, [
       isFeatureEnabled(FEATURE_KEYS.DATA_CODES)
-        ? { label: "코드관리", href: ROUTES.DATA_CODES, icon: Database }
+        ? { label: t("nav.dataCodes"), href: ROUTES.DATA_CODES, icon: Database }
         : null,
     ]),
-    groupItem("게시판", MessageSquareText, [
+    groupItem(t("nav.boards"), MessageSquareText, [
       isFeatureEnabled(FEATURE_KEYS.NOTICES)
-        ? { label: "공지사항", href: ROUTES.NOTICES, icon: Bell }
+        ? { label: t("nav.notices"), href: ROUTES.NOTICES, icon: Bell }
         : null,
       isFeatureEnabled(FEATURE_KEYS.INQUIRIES)
-        ? { label: "질의", href: ROUTES.INQUIRIES, icon: HelpCircle }
+        ? { label: t("nav.inquiries"), href: ROUTES.INQUIRIES, icon: HelpCircle }
         : null,
       isFeatureEnabled(FEATURE_KEYS.QNA)
-        ? { label: "Q&A", href: ROUTES.QNA, icon: MessageSquareText }
+        ? { label: t("nav.qna"), href: ROUTES.QNA, icon: MessageSquareText }
         : null,
     ]),
   ]);
 }
 
-export function getAdminQuickLinks(): AdminQuickLink[] {
+export function getAdminQuickLinks(t: Translator): AdminQuickLink[] {
   const links: Array<AdminQuickLink | null> = [
     isFeatureEnabled(FEATURE_KEYS.USER_PERMISSIONS)
-      ? { title: "사용자권한 정보", description: "가입자와 권한 관리", href: ROUTES.USERS.ROOT, icon: Users }
+      ? { title: t("nav.userPermissions"), description: t("quick.userPermissions"), href: ROUTES.USERS.ROOT, icon: Users }
       : null,
     isFeatureEnabled(FEATURE_KEYS.LOGIN_HISTORY)
-      ? { title: "로그인 이력", description: "접속 성공/실패 확인", href: ROUTES.USERS.LOGIN_HISTORY, icon: History }
+      ? { title: t("nav.loginHistory"), description: t("quick.loginHistory"), href: ROUTES.USERS.LOGIN_HISTORY, icon: History }
+      : null,
+    isFeatureEnabled(FEATURE_KEYS.DIGITAL_MAP)
+      ? {
+          title: t("nav.digitalMap"),
+          description: t("quick.digitalMap"),
+          href: ROUTES.DIGITAL_MAP,
+          icon: Map,
+          popup: { width: 1280, height: 820 },
+        }
       : null,
     isFeatureEnabled(FEATURE_KEYS.ORGANIZATIONS)
-      ? { title: "조직관리", description: "조직코드와 활성 상태", href: ROUTES.ORGANIZATIONS, icon: Building2 }
+      ? { title: t("nav.organizations"), description: t("quick.organizations"), href: ROUTES.ORGANIZATIONS, icon: Building2 }
       : null,
     isFeatureEnabled(FEATURE_KEYS.DATA_CODES)
-      ? { title: "코드관리", description: "대/중/소 분류 코드", href: ROUTES.DATA_CODES, icon: Database }
+      ? { title: t("nav.dataCodes"), description: t("quick.dataCodes"), href: ROUTES.DATA_CODES, icon: Database }
       : null,
     isFeatureEnabled(FEATURE_KEYS.NOTICES)
-      ? { title: "공지사항", description: "고정 공지 및 운영 안내", href: ROUTES.NOTICES, icon: Bell }
+      ? { title: t("nav.notices"), description: t("quick.notices"), href: ROUTES.NOTICES, icon: Bell }
       : null,
     isFeatureEnabled(FEATURE_KEYS.INQUIRIES)
-      ? { title: "질의", description: "문의 접수 및 처리", href: ROUTES.INQUIRIES, icon: HelpCircle }
+      ? { title: t("nav.inquiries"), description: t("quick.inquiries"), href: ROUTES.INQUIRIES, icon: HelpCircle }
       : null,
     isFeatureEnabled(FEATURE_KEYS.QNA)
-      ? { title: "Q&A", description: "자주 묻는 질문 관리", href: ROUTES.QNA, icon: MessageSquareText }
+      ? { title: t("nav.qna"), description: t("quick.qna"), href: ROUTES.QNA, icon: MessageSquareText }
       : null,
   ];
 

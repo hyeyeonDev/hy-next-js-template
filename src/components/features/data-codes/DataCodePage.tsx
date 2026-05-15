@@ -78,7 +78,7 @@ export function DataCodePage() {
   return (
     <AdminLayout title="코드관리">
       <RoleGuard
-        roles={["admin", "manager"]}
+        roles={["ADMIN", "MANAGER"]}
         fallback={
           <Card className="mx-auto max-w-xl text-center">
             <Shield className="mx-auto h-8 w-8 text-danger-500" aria-hidden="true" />
