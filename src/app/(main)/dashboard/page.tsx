@@ -6,6 +6,7 @@ import { AuthGuard } from "@/components/auth";
 import { BarChart, ChartCard, LineChart } from "@/components/charts";
 import { Footer, Header, MainLayout, PageWrapper, UserAccountMenu } from "@/components/layout";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { DashboardThreeScene } from "@/components/three";
 import { getAdminQuickLinks, getAdminSidebarItems, isStorybookMenuEnabled } from "@/components/layout/admin-navigation";
 import { Badge, Button, Card, CardHeader, CardTitle, CardDescription, Table } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
@@ -116,6 +117,16 @@ export default function DashboardPage() {
         }
       >
         <PageWrapper title={t("dashboard.title")} description={t("dashboard.description")}>
+          <DashboardThreeScene
+            title="DGIS"
+            description={locale === "en" ? "Digital operations dashboard" : "디지털 운영 현황"}
+            metrics={[
+              { label: t("dashboard.totalUsers"), value: "1,284" },
+              { label: t("dashboard.activeSessions"), value: "342" },
+              { label: t("dashboard.errorCount"), value: "7" },
+            ]}
+          />
+
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {stats.map((s) => (
               <Card key={s.label} padding="sm">

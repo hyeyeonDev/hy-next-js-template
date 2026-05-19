@@ -34,18 +34,20 @@ interface MapItem {
   status: "진행" | "완료" | "대기";
   x: number;
   y: number;
+  lat: number;
+  lng: number;
 }
 
 const projectItems: MapItem[] = [
-  { id: "P-2026-001", name: "서부 도시철도 지반조사", type: "철도", location: "서울 마포구", status: "진행", x: 59, y: 42 },
-  { id: "P-2026-014", name: "하천 정비 기본 조사", type: "하천", location: "경기 고양시", status: "완료", x: 47, y: 58 },
-  { id: "P-2026-021", name: "산업단지 부지 안정성 평가", type: "산단", location: "인천 서구", status: "대기", x: 34, y: 36 },
+  { id: "P-2026-001", name: "서부 도시철도 지반조사", type: "철도", location: "서울 마포구", status: "진행", x: 59, y: 42, lat: 37.5665, lng: 126.978 },
+  { id: "P-2026-014", name: "하천 정비 기본 조사", type: "하천", location: "경기 고양시", status: "완료", x: 47, y: 58, lat: 37.6584, lng: 126.832 },
+  { id: "P-2026-021", name: "산업단지 부지 안정성 평가", type: "산단", location: "인천 서구", status: "대기", x: 34, y: 36, lat: 37.4563, lng: 126.7052 },
 ];
 
 const testItems: MapItem[] = [
-  { id: "T-BH-104", name: "BH-104 표준관입시험", type: "시추공", location: "GL-12.4m", status: "진행", x: 62, y: 51 },
-  { id: "T-CB-221", name: "CBR 현장 시험", type: "토질", location: "STA. 3+420", status: "완료", x: 44, y: 47 },
-  { id: "T-WT-018", name: "지하수위 관측", type: "수위", location: "WL-08", status: "대기", x: 71, y: 34 },
+  { id: "T-BH-104", name: "BH-104 표준관입시험", type: "시추공", location: "GL-12.4m", status: "진행", x: 62, y: 51, lat: 37.5519, lng: 126.94 },
+  { id: "T-CB-221", name: "CBR 현장 시험", type: "토질", location: "STA. 3+420", status: "완료", x: 44, y: 47, lat: 37.487, lng: 126.825 },
+  { id: "T-WT-018", name: "지하수위 관측", type: "수위", location: "WL-08", status: "대기", x: 71, y: 34, lat: 37.7599, lng: 126.7802 },
 ];
 
 const tools: Array<{ key: ToolKey; label: string; icon: React.ComponentType<{ className?: string }> }> = [
@@ -62,13 +64,64 @@ function statusClass(status: MapItem["status"]) {
   return "bg-warning-50 text-warning-700";
 }
 
+function getInitialMapState() {
+  if (typeof window === "undefined") {
+    return {
+      activeTab: "project" as LeftTab,
+      selectedItem: projectItems[0] as MapItem | null,
+      keyword: "",
+      zoomed: false,
+      focusLabel: null as string | null,
+    };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const target = params.get("target");
+  const tab = params.get("tab");
+  const lat = params.get("lat");
+  const lng = params.get("lng");
+  const activeTab: LeftTab = tab === "test" ? "test" : "project";
+  const items = activeTab === "project" ? projectItems : testItems;
+  const selectedItem = items.find((item) => item.id === target) ?? null;
+
+  if (selectedItem) {
+    return {
+      activeTab,
+      selectedItem,
+      keyword: selectedItem.name,
+      zoomed: true,
+      focusLabel: `${selectedItem.location} (${selectedItem.id})`,
+    };
+  }
+
+  if (target || lat || lng) {
+    return {
+      activeTab,
+      selectedItem,
+      keyword: "",
+      zoomed: true,
+      focusLabel: lat && lng ? `위도 ${lat}, 경도 ${lng}` : target,
+    };
+  }
+
+  return {
+    activeTab: "project" as LeftTab,
+    selectedItem: projectItems[0] as MapItem | null,
+    keyword: "",
+    zoomed: false,
+    focusLabel: null as string | null,
+  };
+}
+
 export function DigitalMapPage() {
-  const [activeTab, setActiveTab] = useState<LeftTab>("project");
-  const [keyword, setKeyword] = useState("");
+  const [initialState] = useState(getInitialMapState);
+  const [activeTab, setActiveTab] = useState<LeftTab>(initialState.activeTab);
+  const [keyword, setKeyword] = useState(initialState.keyword);
   const [layer, setLayer] = useState<MapLayer>("base");
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomed, setZoomed] = useState(initialState.zoomed);
   const [activeTool, setActiveTool] = useState<ToolKey | null>(null);
-  const [selectedItem, setSelectedItem] = useState<MapItem | null>(projectItems[0]);
+  const [selectedItem, setSelectedItem] = useState<MapItem | null>(initialState.selectedItem);
+  const [focusLabel, setFocusLabel] = useState<string | null>(initialState.focusLabel);
 
   const items = activeTab === "project" ? projectItems : testItems;
   const filteredItems = useMemo(() => {
@@ -129,6 +182,7 @@ export function DigitalMapPage() {
               onClick={() => {
                 setActiveTab("project");
                 setSelectedItem(projectItems[0]);
+                setFocusLabel(null);
               }}
             >
               프로젝트 분류
@@ -141,6 +195,7 @@ export function DigitalMapPage() {
               onClick={() => {
                 setActiveTab("test");
                 setSelectedItem(testItems[0]);
+                setFocusLabel(null);
               }}
             >
               시험
@@ -253,12 +308,22 @@ export function DigitalMapPage() {
                 <dd>{selectedItem.location}</dd>
                 <dt>상태</dt>
                 <dd>{selectedItem.status}</dd>
+                <dt>좌표</dt>
+                <dd>
+                  {selectedItem.lat.toFixed(4)}, {selectedItem.lng.toFixed(4)}
+                </dd>
               </dl>
             </div>
           ) : (
             <p className="mt-3 text-xs text-text-muted">왼쪽 목록 또는 지도 마커를 선택하세요.</p>
           )}
         </section>
+
+        {focusLabel && (
+          <section className="absolute left-1/2 top-[4.5rem] z-10 -translate-x-1/2 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-xs font-medium text-primary-700 shadow-lg">
+            지구본에서 선택한 위치: {focusLabel}
+          </section>
+        )}
 
         {activeTool === "legend" && (
           <section className="absolute bottom-4 left-[24rem] z-10 rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">

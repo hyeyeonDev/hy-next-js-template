@@ -2,6 +2,7 @@ export * from "./auth.api";
 export * from "./comments.api";
 export * from "./content.api";
 export * from "./data-code.api";
+export * from "./digital-map.api";
 export * from "./external.api";
 export * from "./login-history.api";
 export * from "./organization.api";

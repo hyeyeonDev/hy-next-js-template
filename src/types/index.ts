@@ -7,3 +7,4 @@ export * from "./data-code";
 export * from "./external";
 export * from "./login-history";
 export * from "./organization";
+export * from "./digital-map";

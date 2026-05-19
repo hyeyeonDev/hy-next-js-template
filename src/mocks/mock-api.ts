@@ -2,6 +2,7 @@ import { handleAuthMock } from "./handlers/auth.handler";
 import { handleCommentsMock } from "./handlers/comments.handler";
 import { handleContentMock } from "./handlers/content.handler";
 import { handleDataCodesMock } from "./handlers/data-codes.handler";
+import { handleDigitalMapMock } from "./handlers/digital-map.handler";
 import { handleLoginHistoryMock } from "./handlers/login-history.handler";
 import { handleOrganizationsMock } from "./handlers/organizations.handler";
 import { handleUsersMock } from "./handlers/users.handler";
@@ -20,6 +21,7 @@ const handlers = [
   handleLoginHistoryMock,
   handleOrganizationsMock,
   handleDataCodesMock,
+  handleDigitalMapMock,
   handleCommentsMock,
   handleContentMock,
 ];

@@ -31,6 +31,9 @@ export const QUERY_KEYS = {
     list: (params: DataCodeListParams) => ["data-codes", "list", params] as const,
     check: (code: string) => ["data-codes", "check", code] as const,
   },
+  DIGITAL_MAP: {
+    locations: () => ["digital-map", "locations"] as const,
+  },
   CONTENTS: {
     all: (kind: ContentKind) => [kind] as const,
     lists: (kind: ContentKind) => [kind, "list"] as const,

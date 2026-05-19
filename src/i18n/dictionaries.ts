@@ -148,7 +148,8 @@ export const dictionaries = {
     "quick.qna": "Manage frequently asked questions",
 
     "dashboard.title": "Dashboard",
-    "dashboard.description": "Review service operations and key management menus.",
+    "dashboard.description":
+      "Review service operations and key management menus.",
     "dashboard.footer": "Admin template operations",
     "dashboard.totalUsers": "Total users",
     "dashboard.monthlySignups": "New this month",
@@ -180,7 +181,8 @@ export const dictionaries = {
     "content.notice.description": "Manage notices shown to users.",
     "content.notice.create": "Create Notice",
     "content.inquiry.title": "Inquiries",
-    "content.inquiry.description": "Manage user inquiries and processing status.",
+    "content.inquiry.description":
+      "Manage user inquiries and processing status.",
     "content.inquiry.create": "Create Inquiry",
     "content.qna.title": "Q&A",
     "content.qna.description": "Manage frequently asked questions and answers.",
