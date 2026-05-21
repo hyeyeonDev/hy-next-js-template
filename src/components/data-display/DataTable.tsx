@@ -19,6 +19,8 @@ export function DataTable<T extends object>({
   emptyMessage,
   onRowClick,
   pagination,
+  className,
+  scrollClassName,
 }: {
   columns: TableColumn<T>[];
   data: T[];
@@ -26,12 +28,14 @@ export function DataTable<T extends object>({
   emptyMessage?: string;
   onRowClick?: (row: T) => void;
   pagination?: DataTablePagination;
+  className?: string;
+  scrollClassName?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-surface">
-      <div className="overflow-x-auto">
+    <div className={cn("overflow-hidden rounded-lg border border-border bg-surface", className)}>
+      <div className={cn("overflow-x-auto", scrollClassName)}>
         <table className="min-w-full divide-y divide-border">
-          <thead className="bg-surface-2">
+          <thead className="sticky top-0 z-10 bg-surface-2">
             <tr>
               {columns.map((col) => (
                 <th

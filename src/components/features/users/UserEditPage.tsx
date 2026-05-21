@@ -12,6 +12,7 @@ import { Card } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 
 import { UserForm } from "./UserForm";
+import { USER_DETAIL_CONTAINER_CLASS } from "./user-layout.constants";
 
 interface UserEditPageProps {
   id: number;
@@ -42,7 +43,6 @@ export function UserEditPage({ id }: UserEditPageProps) {
               사용자 상세
             </Link>
           }
-          className="max-w-3xl"
         >
           {userQuery.isLoading && <LoadingState message="사용자 정보를 불러오는 중..." />}
 
@@ -53,24 +53,39 @@ export function UserEditPage({ id }: UserEditPageProps) {
             )}
 
             {userQuery.data && (
-              <Card>
-                <UserForm
-                  user={userQuery.data}
-                  canEditRole
-                  loading={updateUser.isPending}
-                  onSubmit={(value) => {
-                    updateUser.mutate(
-                      { id, dto: value },
-                      {
-                        onSuccess: () => {
-                          toast("사용자 정보가 수정되었습니다.", "success");
-                          router.replace(ROUTES.USERS.DETAIL(id));
-                        },
-                      },
-                    );
-                  }}
-                />
-              </Card>
+              <div className={USER_DETAIL_CONTAINER_CLASS}>
+                <Card className="overflow-hidden" padding="none">
+                  <div className="border-b border-border bg-surface-2 px-6 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-100 text-base font-semibold text-primary-700">
+                        {userQuery.data.name.slice(0, 1)}
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="truncate text-lg font-semibold text-text">기본 정보 수정</h2>
+                        <p className="truncate text-sm text-text-muted">{userQuery.data.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <UserForm
+                      user={userQuery.data}
+                      canEditRole
+                      loading={updateUser.isPending}
+                      onSubmit={(value) => {
+                        updateUser.mutate(
+                          { id, dto: value },
+                          {
+                            onSuccess: () => {
+                              toast("사용자 정보가 수정되었습니다.", "success");
+                              router.replace(ROUTES.USERS.DETAIL(id));
+                            },
+                          },
+                        );
+                      }}
+                    />
+                  </div>
+                </Card>
+              </div>
             )}
         </PageWrapper>
       </RoleGuard>

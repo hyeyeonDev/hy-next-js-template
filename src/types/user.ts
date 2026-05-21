@@ -11,10 +11,11 @@ export interface User {
   birthDate?: string;
   phone?: string;
   address?: string;
+  addressDetail?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateUserDto { name: string; email: string; role: UserRole; password: string }
-export interface UpdateUserDto { name?: string; role?: UserRole; status?: UserStatus; birthDate?: string; phone?: string; address?: string }
+export interface UpdateUserDto { name?: string; role?: UserRole; status?: UserStatus; birthDate?: string; phone?: string; address?: string; addressDetail?: string }
 export interface UserListParams { page?: number; pageSize?: number; search?: string; status?: UserStatus }

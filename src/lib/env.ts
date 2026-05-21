@@ -30,6 +30,17 @@ export const env = {
   /** Google Analytics ID (선택) */
   GA_ID: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? "",
 
+  /** i18n 저장소: file 또는 s3 */
+  I18N_STORAGE: optionalEnv("I18N_STORAGE", "file") as "file" | "s3",
+
+  /** file 저장소일 때 사용할 locale JSON 폴더 */
+  I18N_LOCALES_DIR: optionalEnv("I18N_LOCALES_DIR", "public/locales"),
+
+  /** S3 저장소 설정 */
+  AWS_REGION: optionalEnv("AWS_REGION", "ap-northeast-2"),
+  I18N_S3_BUCKET: optionalEnv("I18N_S3_BUCKET"),
+  I18N_S3_PREFIX: optionalEnv("I18N_S3_PREFIX", "locales"),
+
   /** 개발 환경 여부 */
   isDev: process.env.NODE_ENV === "development",
   isProd: process.env.NODE_ENV === "production",

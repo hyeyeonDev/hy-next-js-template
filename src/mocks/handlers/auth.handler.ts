@@ -31,6 +31,9 @@ function login(body: unknown) {
       birthDate: user.birthDate,
       phone: user.phone,
       address: user.address,
+      addressDetail: user.addressDetail,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     },
   });
 }
@@ -71,6 +74,9 @@ function signup(body: unknown) {
       birthDate: user.birthDate,
       phone: user.phone,
       address: user.address,
+      addressDetail: user.addressDetail,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     },
   });
 }
@@ -114,6 +120,7 @@ function updateMe(body: unknown) {
     birthDate: dto.birthDate,
     phone: dto.phone,
     address: dto.address,
+    addressDetail: dto.addressDetail,
     updatedAt: new Date().toISOString(),
   };
 
@@ -130,6 +137,9 @@ function updateMe(body: unknown) {
     birthDate: updated.birthDate,
     phone: updated.phone,
     address: updated.address,
+    addressDetail: updated.addressDetail,
+    createdAt: updated.createdAt,
+    updatedAt: updated.updatedAt,
   }, "내 정보가 수정되었습니다.");
 }
 
@@ -178,6 +188,9 @@ export function handleAuthMock({ method, path, body }: MockRequest) {
       birthDate: mockStore.currentUser.birthDate,
       phone: mockStore.currentUser.phone,
       address: mockStore.currentUser.address,
+      addressDetail: mockStore.currentUser.addressDetail,
+      createdAt: mockStore.currentUser.createdAt,
+      updatedAt: mockStore.currentUser.updatedAt,
     });
   }
 

@@ -18,7 +18,6 @@ import {
   X,
 } from "lucide-react";
 
-import { AuthGuard } from "@/components/auth";
 import { Button, Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -136,8 +135,7 @@ export function DigitalMapPage() {
   const visibleMarkers = activeTab === "project" ? projectItems : testItems;
 
   return (
-    <AuthGuard>
-      <main className="relative h-screen overflow-hidden bg-[#dce7df] text-text">
+    <main className="relative h-screen overflow-hidden bg-[#dce7df] text-text">
         <div
           className={cn(
             "absolute inset-0 transition-colors",
@@ -354,8 +352,7 @@ export function DigitalMapPage() {
         {zoomed && (
           <div className="pointer-events-none absolute left-1/2 top-1/2 z-[4] h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-primary-500/70 bg-primary-50/20" />
         )}
-      </main>
-    </AuthGuard>
+    </main>
   );
 }
 

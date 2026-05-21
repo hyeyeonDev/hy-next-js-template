@@ -30,6 +30,7 @@ export const ROUTES = {
 
   SETTINGS: {
     ROOT:    "/settings",
+    I18N:    "/settings/i18n",
     PROFILE: "/settings/profile",
     TEAM:    "/settings/team",
   },

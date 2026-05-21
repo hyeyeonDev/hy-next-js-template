@@ -47,6 +47,7 @@
 
   --color-danger-50: #fef2f2;
   --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
   --color-danger-500: #ef4444;
   --color-danger-600: #dc2626;
   --color-danger-700: #b91c1c;
@@ -125,6 +126,7 @@
 
   --color-danger-50: #2d0a0a;
   --color-danger-100: #450a0a;
+  --color-danger-200: #7f1d1d;
   --color-danger-500: #f87171;
   --color-danger-600: #fca5a5;
   --color-danger-700: #fecaca;
@@ -191,6 +193,7 @@
 
   --color-danger-50: var(--color-danger-50);
   --color-danger-100: var(--color-danger-100);
+  --color-danger-200: var(--color-danger-200);
   --color-danger-500: var(--color-danger-500);
   --color-danger-600: var(--color-danger-600);
   --color-danger-700: var(--color-danger-700);

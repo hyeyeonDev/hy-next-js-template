@@ -101,7 +101,7 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
                     <span>{t("content.writer")} {detailQuery.data.authorName}</span>
                     <span>{t("table.views")} {detailQuery.data.viewCount.toLocaleString()}</span>
-                    <span>{t("content.createdAt")} {new Date(detailQuery.data.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "ko-KR")}</span>
+                    <span>{t("content.createdAt")} {new Date(detailQuery.data.createdAt).toLocaleDateString(locale === "EN" ? "en-US" : "ko-KR")}</span>
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap py-6 text-sm leading-7 text-text">{detailQuery.data.content}</div>

@@ -11,6 +11,7 @@ export const FEATURE_KEYS = {
   NOTICES: "notices",
   INQUIRIES: "inquiries",
   QNA: "qna",
+  I18N: "i18n",
   STORYBOOK: "storybook",
   ERROR_PREVIEW: "error-preview",
 } as const;
@@ -31,6 +32,7 @@ const RELEASED_FEATURES = new Set<FeatureKey>([
   FEATURE_KEYS.NOTICES,
   FEATURE_KEYS.INQUIRIES,
   FEATURE_KEYS.QNA,
+  FEATURE_KEYS.I18N,
 ]);
 
 /**
@@ -52,6 +54,7 @@ const FEATURE_ROUTE_RULES: Array<{ key: FeatureKey; paths: string[] }> = [
   { key: FEATURE_KEYS.NOTICES, paths: ["/boards/notices"] },
   { key: FEATURE_KEYS.INQUIRIES, paths: ["/boards/inquiries"] },
   { key: FEATURE_KEYS.QNA, paths: ["/boards/qna"] },
+  { key: FEATURE_KEYS.I18N, paths: ["/settings/i18n"] },
   { key: FEATURE_KEYS.DASHBOARD, paths: ["/dashboard"] },
   { key: FEATURE_KEYS.DIGITAL_MAP, paths: ["/digital-map"] },
   { key: FEATURE_KEYS.MY_PAGE, paths: ["/mypage"] },

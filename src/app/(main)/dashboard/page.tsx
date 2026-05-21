@@ -1,16 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Palette, Settings } from "lucide-react";
-import { AuthGuard } from "@/components/auth";
 import { BarChart, ChartCard, LineChart } from "@/components/charts";
-import { Footer, Header, MainLayout, PageWrapper, UserAccountMenu } from "@/components/layout";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { PageWrapper } from "@/components/layout";
 import { DashboardThreeScene } from "@/components/three";
-import { getAdminQuickLinks, getAdminSidebarItems, isStorybookMenuEnabled } from "@/components/layout/admin-navigation";
+import { getAdminQuickLinks } from "@/constants/menu";
 import { Badge, Button, Card, CardHeader, CardTitle, CardDescription, Table } from "@/components/ui";
-import { ROUTES } from "@/constants/routes";
-import { FEATURE_KEYS, isFeatureEnabled } from "@/lib/feature-flags";
 import { useI18n } from "@/i18n";
 
 type Log = { id: number; user: string; action: string; time: string; status: string };
@@ -23,7 +18,6 @@ const recentLogs: Log[] = [
 
 export default function DashboardPage() {
   const { t, locale } = useI18n();
-  const sidebarItems = getAdminSidebarItems(t);
   const quickLinks = getAdminQuickLinks(t);
   const stats = [
     { label: t("dashboard.totalUsers"), value: "1,284", change: "+12%", up: true },
@@ -31,7 +25,7 @@ export default function DashboardPage() {
     { label: t("dashboard.activeSessions"), value: "342", change: "-3%", up: false },
     { label: t("dashboard.errorCount"), value: "7", change: "-40%", up: true },
   ];
-  const dashboardMonths = locale === "en" ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] : ["1월", "2월", "3월", "4월", "5월", "6월"];
+  const dashboardMonths = locale === "EN" ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] : ["1월", "2월", "3월", "4월", "5월", "6월"];
   const dashboardTraffic = [
     { name: t("dashboard.visit"), data: [120, 180, 240, 220, 310, 380] },
     { name: t("dashboard.signup"), data: [24, 36, 42, 48, 64, 82] },
@@ -56,70 +50,10 @@ export default function DashboardPage() {
   ];
 
   return (
-    <AuthGuard>
-      <MainLayout
-        sidebar={{
-          logo: (
-            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-text">
-              <Settings className="h-4 w-4" aria-hidden="true" />
-              Admin
-            </span>
-          ),
-          items: sidebarItems,
-          footer: isStorybookMenuEnabled() ? (
-            <Link
-              href={ROUTES.STORYBOOK}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-primary-600 transition-colors hover:bg-primary-50"
-            >
-              <Palette className="h-4 w-4" aria-hidden="true" />
-              {t("nav.components")}
-            </Link>
-          ) : null,
-        }}
-        topbar={
-          <Header
-            title={t("dashboard.title")}
-            actions={
-              <>
-                <LanguageSwitcher />
-                <Badge variant="success" dot>
-                  {t("common.systemHealthy")}
-                </Badge>
-                <UserAccountMenu />
-              </>
-            }
-          />
-        }
-        footer={
-          <Footer>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span>{t("dashboard.footer")}</span>
-              <div className="flex items-center gap-3">
-                {isStorybookMenuEnabled() && (
-                  <Link className="hover:text-primary-600 hover:underline" href={ROUTES.STORYBOOK}>
-                    {t("nav.components")}
-                  </Link>
-                )}
-                <Link className="hover:text-primary-600 hover:underline" href={ROUTES.AUTH.LOGIN}>
-                  {t("common.login")}
-                </Link>
-                <Link className="hover:text-primary-600 hover:underline" href={ROUTES.AUTH.SIGNUP}>
-                  {t("common.signup")}
-                </Link>
-                {isFeatureEnabled(FEATURE_KEYS.MY_PAGE) && (
-                  <Link className="hover:text-primary-600 hover:underline" href={ROUTES.MY_PAGE}>
-                    {t("nav.myPage")}
-                  </Link>
-                )}
-              </div>
-            </div>
-          </Footer>
-        }
-      >
-        <PageWrapper title={t("dashboard.title")} description={t("dashboard.description")}>
+    <PageWrapper title={t("dashboard.title")} description={t("dashboard.description")}>
           <DashboardThreeScene
             title="DGIS"
-            description={locale === "en" ? "Digital operations dashboard" : "디지털 운영 현황"}
+            description={locale === "EN" ? "Digital operations dashboard" : "디지털 운영 현황"}
             metrics={[
               { label: t("dashboard.totalUsers"), value: "1,284" },
               { label: t("dashboard.activeSessions"), value: "342" },
@@ -195,8 +129,6 @@ export default function DashboardPage() {
             </CardHeader>
             <Table columns={logColumns as never} data={recentLogs as never} rowKey="id" />
           </Card>
-        </PageWrapper>
-      </MainLayout>
-    </AuthGuard>
+    </PageWrapper>
   );
 }

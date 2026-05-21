@@ -9,11 +9,11 @@ import { RoleGuard } from "@/components/auth";
 import { LoadingState } from "@/components/data-display";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useToast } from "@/components/ui/toast";
-import { Badge, Button, Card } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { isAdminRole } from "@/lib/roles";
 
-import { userRoleLabel, userStatusLabel } from "./user-meta";
+import { UserProfileCard } from "./UserProfileCard";
+import { USER_DETAIL_CONTAINER_CLASS } from "./user-layout.constants";
 
 interface UserDetailPageProps {
   id: number;
@@ -39,49 +39,13 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
           }
           actions={
             <RoleGuard roles={["ADMIN"]}>
-              <div className="flex gap-2">
-                <Link
-                  href={ROUTES.USERS.EDIT(id)}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-medium text-white transition-colors hover:bg-primary-700"
-                >
-                  <Edit className="h-4 w-4" aria-hidden="true" />
-                  수정
-                </Link>
-                {userQuery.data?.status !== "withdrawn" && (
-                  <Button
-                    variant="warning"
-                    leftIcon={<UserMinus aria-hidden="true" />}
-                    loading={withdrawUser.isPending}
-                    onClick={() => {
-                      const ok = window.confirm("이 사용자를 탈퇴 처리할까요?");
-                      if (!ok) return;
-
-                      withdrawUser.mutate(id, {
-                        onSuccess: () => {
-                          toast("사용자가 탈퇴 처리되었습니다.", "danger");
-                        },
-                      });
-                    }}
-                  >
-                    탈퇴 처리
-                  </Button>
-                )}
-                <Button
-                  variant="danger"
-                  leftIcon={<Trash2 aria-hidden="true" />}
-                  loading={deleteUser.isPending}
-                  onClick={() => {
-                    deleteUser.mutate(id, {
-                      onSuccess: () => {
-                        toast("사용자가 삭제되었습니다.", "danger");
-                        router.replace(ROUTES.USERS.ROOT);
-                      },
-                    });
-                  }}
-                >
-                  삭제
-                </Button>
-              </div>
+              <Link
+                href={ROUTES.USERS.EDIT(id)}
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+              >
+                <Edit className="h-4 w-4" aria-hidden="true" />
+                수정
+              </Link>
             </RoleGuard>
           }
         >
@@ -95,62 +59,60 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
             )}
 
             {userQuery.data && (
-              <Card>
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-100 text-lg font-semibold text-primary-700">
-                    {userQuery.data.name.slice(0, 1)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-xl font-semibold text-text">{userQuery.data.name}</h2>
-                      <Badge variant={isAdminRole(userQuery.data.role) ? "danger" : userQuery.data.role === "MANAGER" ? "warning" : "secondary"}>
-                        {userRoleLabel[userQuery.data.role]}
-                      </Badge>
-                      <Badge
-                        variant={
-                          userQuery.data.status === "active"
-                            ? "success"
-                            : userQuery.data.status === "pending"
-                              ? "warning"
-                              : userQuery.data.status === "withdrawn"
-                                ? "danger"
-                                : "secondary"
-                        }
-                        dot
-                      >
-                        {userStatusLabel[userQuery.data.status]}
-                      </Badge>
+              <div className={USER_DETAIL_CONTAINER_CLASS}>
+                <UserProfileCard user={userQuery.data} readOnly canEditRole />
+
+                <RoleGuard roles={["ADMIN"]}>
+                  <div className="rounded-xl border border-danger-200 bg-danger-50 p-6 shadow-sm">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-danger-700">위험 작업</h3>
+                        <p className="mt-1 text-sm text-danger-600">
+                          탈퇴 처리는 계정 상태를 탈퇴로 변경합니다. 삭제는 사용자 데이터를 목록에서 제거합니다.
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        {userQuery.data.status !== "withdrawn" && (
+                          <Button
+                            size="lg"
+                            variant="warning"
+                            leftIcon={<UserMinus aria-hidden="true" />}
+                            loading={withdrawUser.isPending}
+                            onClick={() => {
+                              const ok = window.confirm("이 사용자를 탈퇴 처리할까요?");
+                              if (!ok) return;
+
+                              withdrawUser.mutate(id, {
+                                onSuccess: () => {
+                                  toast("사용자가 탈퇴 처리되었습니다.", "danger");
+                                },
+                              });
+                            }}
+                          >
+                            탈퇴 처리
+                          </Button>
+                        )}
+                        <Button
+                          size="lg"
+                          variant="danger"
+                          leftIcon={<Trash2 aria-hidden="true" />}
+                          loading={deleteUser.isPending}
+                          onClick={() => {
+                            deleteUser.mutate(id, {
+                              onSuccess: () => {
+                                toast("사용자가 삭제되었습니다.", "danger");
+                                router.replace(ROUTES.USERS.ROOT);
+                              },
+                            });
+                          }}
+                        >
+                          사용자 삭제
+                        </Button>
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm text-text-muted">{userQuery.data.email}</p>
-                    <dl className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div className="rounded-lg border border-border bg-surface-2 p-4">
-                        <dt className="text-xs text-text-muted">생년월일</dt>
-                        <dd className="mt-1 text-sm font-medium text-text">{userQuery.data.birthDate || "-"}</dd>
-                      </div>
-                      <div className="rounded-lg border border-border bg-surface-2 p-4">
-                        <dt className="text-xs text-text-muted">전화번호</dt>
-                        <dd className="mt-1 text-sm font-medium text-text">{userQuery.data.phone || "-"}</dd>
-                      </div>
-                      <div className="rounded-lg border border-border bg-surface-2 p-4 sm:col-span-2">
-                        <dt className="text-xs text-text-muted">주소</dt>
-                        <dd className="mt-1 text-sm font-medium text-text">{userQuery.data.address || "-"}</dd>
-                      </div>
-                      <div className="rounded-lg border border-border bg-surface-2 p-4">
-                        <dt className="text-xs text-text-muted">가입일</dt>
-                        <dd className="mt-1 text-sm font-medium text-text">
-                          {new Date(userQuery.data.createdAt).toLocaleString("ko-KR")}
-                        </dd>
-                      </div>
-                      <div className="rounded-lg border border-border bg-surface-2 p-4">
-                        <dt className="text-xs text-text-muted">최근 수정일</dt>
-                        <dd className="mt-1 text-sm font-medium text-text">
-                          {new Date(userQuery.data.updatedAt).toLocaleString("ko-KR")}
-                        </dd>
-                      </div>
-                    </dl>
                   </div>
-                </div>
-              </Card>
+                </RoleGuard>
+              </div>
             )}
         </PageWrapper>
       </RoleGuard>
