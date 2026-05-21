@@ -106,7 +106,9 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                 </div>
                 <div className="whitespace-pre-wrap py-6 text-sm leading-7 text-text">{detailQuery.data.content}</div>
               </Card>
-              <CommentThread kind={kind} contentId={id} allowReplies={meta.allowReplies} />
+              {meta.allowComments && (
+                <CommentThread kind={kind} contentId={id} allowReplies={meta.allowReplies} />
+              )}
             </div>
           )}
       </PageWrapper>

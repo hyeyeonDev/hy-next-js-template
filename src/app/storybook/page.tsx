@@ -70,7 +70,6 @@ import { ConfirmDialog, Snackbar } from "@/components/feedback";
 // Navigation
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { BarChart, ChartCard, LineChart, PieChart } from "@/components/charts";
-import { DashboardThreeScene } from "@/components/three";
 import {
   Container as LayoutContainer,
   Footer as LayoutFooter,
@@ -905,23 +904,6 @@ export default function StorybookPage() {
             <PieChart data={roleShare} className="h-80" />
           </ChartCard>
         </div>
-      </Section>
-
-      {/* ── Three.js ── */}
-      <Section
-        id="three"
-        title="Three.js"
-        description="대시보드나 홈 화면에서 교체해 사용할 수 있는 3D 섹션입니다."
-      >
-        <DashboardThreeScene
-          title="DGIS"
-          description="디지털 운영 현황"
-          metrics={[
-            { label: "사용자", value: "1,284" },
-            { label: "세션", value: "342" },
-            { label: "오류", value: "7" },
-          ]}
-        />
       </Section>
 
       {/* ── Alert / Feedback ── */}

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -257,4 +259,75 @@
     background: var(--color-border-strong);
     border-radius: var(--radius-full);
   }
+}
+
+.dgis-ag-grid {
+  --ag-font-family: var(--font-sans);
+  --ag-font-size: 0.875rem;
+  --ag-background-color: var(--color-surface);
+  --ag-foreground-color: var(--color-text);
+  --ag-border-color: var(--color-border);
+  --ag-header-background-color: var(--color-surface-2);
+  --ag-header-foreground-color: var(--color-text-muted);
+  --ag-row-hover-color: var(--color-surface-2);
+  --ag-selected-row-background-color: var(--color-primary-50);
+  --ag-odd-row-background-color: var(--color-surface);
+  --ag-data-color: var(--color-text-muted);
+  --ag-secondary-foreground-color: var(--color-text-muted);
+  --ag-active-color: var(--color-primary-600);
+  --ag-border-radius: var(--radius-lg);
+  --ag-wrapper-border-radius: var(--radius-lg);
+  --ag-cell-horizontal-padding: 1rem;
+  --ag-row-border-color: var(--color-border);
+  --ag-pagination-panel-height: 3.25rem;
+}
+
+.dgis-ag-grid .ag-root-wrapper {
+  border: 0;
+}
+
+.dgis-ag-grid .ag-header-cell-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.dgis-ag-grid .ag-cell {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+  overflow: visible;
+}
+
+.dgis-ag-grid .ag-cell-value {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.dgis-ag-grid .ag-paging-panel {
+  border-top-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.dgis-ag-grid .dgis-ag-cell-center {
+  justify-content: center;
+  text-align: center;
+}
+
+.dgis-ag-grid .dgis-ag-cell-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.dgis-ag-grid-clickable .ag-row {
+  cursor: pointer;
+}
+
+.dgis-ag-grid .ag-overlay-loading-center,
+.dgis-ag-grid .ag-overlay-no-rows-center {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
 }

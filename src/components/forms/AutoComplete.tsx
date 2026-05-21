@@ -32,16 +32,14 @@ export function AutoComplete({ options, value, onChange, onSelect, placeholder }
   };
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-    >
+    <div className="relative">
       <Input
         value={inputValue}
         onChange={(event) => {
           update(event.target.value);
           setOpen(true);
         }}
+        onClick={() => setOpen(true)}
         onFocus={() => setOpen(true)}
         onBlur={() => {
           window.setTimeout(() => setOpen(false), 120);

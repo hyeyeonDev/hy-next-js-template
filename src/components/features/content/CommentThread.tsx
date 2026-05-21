@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquareReply, Pencil, Trash2 } from "lucide-react";
+import {
+  MessageCircle,
+  MessageSquareReply,
+  Pencil,
+  Send,
+  Trash2,
+} from "lucide-react";
 
 import {
   useCommentsQuery,
@@ -75,82 +81,99 @@ export function CommentThread({ kind, contentId, allowReplies = true }: CommentT
     );
   };
 
+  const comments = commentsQuery.data ?? [];
+
   return (
-    <Card>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h3 className="text-base font-semibold text-text">댓글</h3>
-          <p className="mt-1 text-xs text-text-muted">
-            실제 API 연결 시 `comments.api.ts`의 service만 교체하면 됩니다.
-          </p>
-        </div>
-        {!allowReplies && <Badge variant="secondary">대댓글 비활성</Badge>}
-      </div>
-
-      <div className="mb-6 space-y-3">
-        <Textarea
-          value={content}
-          onChange={(event) => setContent(event.target.value)}
-          rows={3}
-          placeholder="댓글을 입력하세요"
-        />
-        <div className="flex justify-end">
-          <Button loading={createComment.isPending} disabled={!content.trim()} onClick={submitComment}>
-            댓글 등록
-          </Button>
+    <Card className="overflow-hidden" padding="none">
+      <div className="border-b border-border bg-surface-2 px-5 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-text">댓글</h3>
+              <p className="mt-0.5 text-xs text-text-muted">{comments.length.toLocaleString()}개의 의견</p>
+            </div>
+          </div>
+          {!allowReplies && <Badge variant="secondary">답글 비활성</Badge>}
         </div>
       </div>
 
-      {commentsQuery.isLoading && <LoadingState message="댓글을 불러오는 중..." />}
-      {commentsQuery.isError && <p className="text-sm text-danger-600">{commentsQuery.error.message}</p>}
-
-      <div className="space-y-4">
-        {(commentsQuery.data ?? []).map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            allowReplies={allowReplies}
-            editingId={editingId}
-            editingContent={editingContent}
-            replyTargetId={replyTargetId}
-            replyContent={replyContent}
-            loadingReply={createReply.isPending}
-            loadingEdit={updateComment.isPending}
-            loadingDelete={deleteComment.isPending}
-            currentUserId={user?.id}
-            isAdmin={isAdminRole(user?.role)}
-            onStartReply={(id) => {
-              setReplyTargetId(id);
-              setReplyContent("");
-            }}
-            onCancelReply={() => {
-              setReplyTargetId(null);
-              setReplyContent("");
-            }}
-            onChangeReply={setReplyContent}
-            onSubmitReply={submitReply}
-            onStartEdit={(target) => {
-              setEditingId(target.id);
-              setEditingContent(target.content);
-            }}
-            onCancelEdit={() => {
-              setEditingId(null);
-              setEditingContent("");
-            }}
-            onChangeEdit={setEditingContent}
-            onSubmitEdit={submitEdit}
-            onDelete={(id) => {
-              deleteComment.mutate(id, {
-                onSuccess: () => toast("댓글이 삭제되었습니다.", "danger"),
-              });
-            }}
+      <div className="border-b border-border px-5 py-5">
+        <div className="rounded-lg border border-border bg-surface p-3">
+          <Textarea
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+            rows={3}
+            placeholder="댓글을 입력하세요"
+            className="border-0 bg-transparent p-0 shadow-none focus:ring-0"
           />
-        ))}
-        {!commentsQuery.isLoading && (commentsQuery.data ?? []).length === 0 && (
-          <p className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-text-muted">
-            아직 등록된 댓글이 없습니다.
-          </p>
-        )}
+          <div className="mt-3 flex justify-end">
+            <Button
+              loading={createComment.isPending}
+              disabled={!content.trim()}
+              rightIcon={<Send className="h-4 w-4" aria-hidden="true" />}
+              onClick={submitComment}
+            >
+              댓글 등록
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-5 py-5">
+        {commentsQuery.isLoading && <LoadingState message="댓글을 불러오는 중..." />}
+        {commentsQuery.isError && <p className="text-sm text-danger-600">{commentsQuery.error.message}</p>}
+
+        <div className="space-y-3">
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              allowReplies={allowReplies}
+              editingId={editingId}
+              editingContent={editingContent}
+              replyTargetId={replyTargetId}
+              replyContent={replyContent}
+              loadingReply={createReply.isPending}
+              loadingEdit={updateComment.isPending}
+              loadingDelete={deleteComment.isPending}
+              currentUserId={user?.id}
+              isAdmin={isAdminRole(user?.role)}
+              onStartReply={(id) => {
+                setReplyTargetId(id);
+                setReplyContent("");
+              }}
+              onCancelReply={() => {
+                setReplyTargetId(null);
+                setReplyContent("");
+              }}
+              onChangeReply={setReplyContent}
+              onSubmitReply={submitReply}
+              onStartEdit={(target) => {
+                setEditingId(target.id);
+                setEditingContent(target.content);
+              }}
+              onCancelEdit={() => {
+                setEditingId(null);
+                setEditingContent("");
+              }}
+              onChangeEdit={setEditingContent}
+              onSubmitEdit={submitEdit}
+              onDelete={(id) => {
+                deleteComment.mutate(id, {
+                  onSuccess: () => toast("댓글이 삭제되었습니다.", "danger"),
+                });
+              }}
+            />
+          ))}
+          {!commentsQuery.isLoading && comments.length === 0 && (
+            <p className="rounded-lg border border-dashed border-border bg-surface-2 py-10 text-center text-sm text-text-muted">
+              아직 등록된 댓글이 없습니다.
+            </p>
+          )}
+        </div>
       </div>
     </Card>
   );
@@ -206,23 +229,36 @@ function CommentItem({
   const canManage = comment.authorId === currentUserId || isAdmin;
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-4">
+    <article className="rounded-lg border border-border bg-surface px-4 py-4 transition-colors hover:border-border-strong">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-text">{comment.authorName}</p>
-          <p className="mt-0.5 text-xs text-text-muted">
-            {new Date(comment.createdAt).toLocaleString("ko-KR")}
-          </p>
+        <div className="flex min-w-0 items-start gap-3">
+          <CommentAvatar name={comment.authorName} />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-text">{comment.authorName}</p>
+            <p className="mt-0.5 text-xs text-text-muted">
+              {new Date(comment.createdAt).toLocaleString("ko-KR")}
+            </p>
+          </div>
         </div>
-        <div className="flex shrink-0 gap-1">
+        <div className="flex shrink-0 flex-wrap justify-end gap-1">
           {allowReplies && (
-            <Button size="xs" variant="ghost" leftIcon={<MessageSquareReply aria-hidden="true" />} onClick={() => onStartReply(comment.id)}>
+            <Button
+              size="xs"
+              variant="ghost"
+              leftIcon={<MessageSquareReply aria-hidden="true" />}
+              onClick={() => onStartReply(comment.id)}
+            >
               답글
             </Button>
           )}
           {canManage && (
             <>
-              <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(comment)}>
+              <Button
+                size="xs"
+                variant="ghost"
+                leftIcon={<Pencil aria-hidden="true" />}
+                onClick={() => onStartEdit(comment)}
+              >
                 수정
               </Button>
               <Button
@@ -241,12 +277,21 @@ function CommentItem({
 
       {isEditing ? (
         <div className="mt-3 space-y-2">
-          <Textarea value={editingContent} onChange={(event) => onChangeEdit(event.target.value)} rows={3} />
+          <Textarea
+            value={editingContent}
+            onChange={(event) => onChangeEdit(event.target.value)}
+            rows={3}
+          />
           <div className="flex justify-end gap-2">
             <Button size="sm" variant="outline" onClick={onCancelEdit}>
               취소
             </Button>
-            <Button size="sm" loading={loadingEdit} disabled={!editingContent.trim()} onClick={() => onSubmitEdit(comment.id)}>
+            <Button
+              size="sm"
+              loading={loadingEdit}
+              disabled={!editingContent.trim()}
+              onClick={() => onSubmitEdit(comment.id)}
+            >
               저장
             </Button>
           </div>
@@ -256,7 +301,7 @@ function CommentItem({
       )}
 
       {isReplying && (
-        <div className="mt-4 space-y-2 border-l-2 border-primary-200 pl-4">
+        <div className="mt-4 rounded-lg border border-primary-100 bg-primary-50/50 p-3">
           <Textarea
             value={replyContent}
             onChange={(event) => onChangeReply(event.target.value)}
@@ -267,7 +312,12 @@ function CommentItem({
             <Button size="sm" variant="outline" onClick={onCancelReply}>
               취소
             </Button>
-            <Button size="sm" loading={loadingReply} disabled={!replyContent.trim()} onClick={() => onSubmitReply(comment.id)}>
+            <Button
+              size="sm"
+              loading={loadingReply}
+              disabled={!replyContent.trim()}
+              onClick={() => onSubmitReply(comment.id)}
+            >
               답글 등록
             </Button>
           </div>
@@ -275,19 +325,27 @@ function CommentItem({
       )}
 
       {!!comment.replies?.length && (
-        <div className="mt-4 space-y-3 border-l-2 border-border pl-4">
+        <div className="mt-4 space-y-3 border-l border-border pl-4">
           {comment.replies.map((reply) => (
-            <div key={reply.id} className="rounded-md bg-surface-2 p-3">
+            <div key={reply.id} className="rounded-lg bg-surface-2 p-3">
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-text">{reply.authorName}</p>
-                  <p className="mt-0.5 text-xs text-text-muted">
-                    {new Date(reply.createdAt).toLocaleString("ko-KR")}
-                  </p>
+                <div className="flex min-w-0 items-start gap-3">
+                  <CommentAvatar name={reply.authorName} size="sm" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-text">{reply.authorName}</p>
+                    <p className="mt-0.5 text-xs text-text-muted">
+                      {new Date(reply.createdAt).toLocaleString("ko-KR")}
+                    </p>
+                  </div>
                 </div>
                 {(reply.authorId === currentUserId || isAdmin) && (
                   <div className="flex shrink-0 gap-1">
-                    <Button size="xs" variant="ghost" leftIcon={<Pencil aria-hidden="true" />} onClick={() => onStartEdit(reply)}>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      leftIcon={<Pencil aria-hidden="true" />}
+                      onClick={() => onStartEdit(reply)}
+                    >
                       수정
                     </Button>
                     <Button
@@ -304,12 +362,21 @@ function CommentItem({
               </div>
               {editingId === reply.id ? (
                 <div className="mt-3 space-y-2">
-                  <Textarea value={editingContent} onChange={(event) => onChangeEdit(event.target.value)} rows={3} />
+                  <Textarea
+                    value={editingContent}
+                    onChange={(event) => onChangeEdit(event.target.value)}
+                    rows={3}
+                  />
                   <div className="flex justify-end gap-2">
                     <Button size="sm" variant="outline" onClick={onCancelEdit}>
                       취소
                     </Button>
-                    <Button size="sm" loading={loadingEdit} disabled={!editingContent.trim()} onClick={() => onSubmitEdit(reply.id)}>
+                    <Button
+                      size="sm"
+                      loading={loadingEdit}
+                      disabled={!editingContent.trim()}
+                      onClick={() => onSubmitEdit(reply.id)}
+                    >
                       저장
                     </Button>
                   </div>
@@ -321,6 +388,21 @@ function CommentItem({
           ))}
         </div>
       )}
-    </div>
+    </article>
+  );
+}
+
+function CommentAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
+  return (
+    <span
+      className={
+        size === "sm"
+          ? "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700"
+          : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700"
+      }
+      aria-hidden="true"
+    >
+      {name.slice(0, 1)}
+    </span>
   );
 }
