@@ -13,6 +13,10 @@ function isPublicRoute(pathname: string) {
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/storybook", request.url));
+  }
+
   if (!isRouteFeatureEnabled(pathname)) {
     return NextResponse.rewrite(new URL("/not-found", request.url), { status: 404 });
   }
