@@ -8,10 +8,12 @@ import { RoleGuard } from "@/components/auth";
 import { DataTable } from "@/components/data-display";
 import { FormField, SearchInput } from "@/components/forms";
 import { AdminLayout, PageWrapper } from "@/components/layout";
+import { useDialog } from "@/components/ui/dialog";
 import { Badge, Button, Card } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
 import { useUsersQuery, useWithdrawUserMutation } from "@/hooks/queries";
 import { ROUTES } from "@/constants/routes";
+import { formatDate } from "@/lib/format";
 import { isAdminRole } from "@/lib/roles";
 import type { TableColumn, User } from "@/types";
 
@@ -37,6 +39,7 @@ export function UserListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const { confirm } = useDialog();
   const usersQuery = useUsersQuery({ page, pageSize: 10, search });
   const withdrawUser = useWithdrawUserMutation();
 
@@ -75,7 +78,7 @@ export function UserListPage() {
         key: "createdAt",
         label: "가입일",
         width: "120px",
-        render: (value) => new Date(String(value)).toLocaleDateString("ko-KR"),
+        render: (value) => formatDate(String(value)),
       },
       {
         key: "id",
@@ -100,8 +103,12 @@ export function UserListPage() {
                   className="text-danger-600 hover:bg-danger-50 hover:text-danger-700"
                   leftIcon={<UserMinus className="h-3.5 w-3.5" aria-hidden="true" />}
                   loading={withdrawUser.isPending}
-                  onClick={() => {
-                    const ok = window.confirm(`${row.name} 사용자를 탈퇴 처리할까요?`);
+                  onClick={async () => {
+                    const ok = await confirm(`${row.name} 사용자를 탈퇴 처리할까요?`, {
+                      message: "탈퇴 처리 후 해당 사용자는 일반 로그인과 서비스 이용이 제한됩니다.",
+                      variant: "danger",
+                      confirmLabel: "탈퇴 처리",
+                    });
                     if (!ok) return;
 
                     withdrawUser.mutate(row.id, {
@@ -119,7 +126,7 @@ export function UserListPage() {
         ),
       },
     ],
-    [toast, withdrawUser],
+    [confirm, toast, withdrawUser],
   );
 
   return (

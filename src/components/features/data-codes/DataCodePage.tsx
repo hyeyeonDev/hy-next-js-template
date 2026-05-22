@@ -15,6 +15,14 @@ import {
   useDataCodesQuery,
   useUpdateDataCodeMutation,
 } from "@/hooks/queries";
+import {
+  getDataCodeFormatHint,
+  getExpectedLargeCode,
+  getExpectedParentCode,
+  normalizeDataCode,
+  validateDataCodeInput,
+} from "@/lib/data-code";
+import { formatDate } from "@/lib/format";
 import type { CreateDataCodeDto, DataCode, DataCodeLevel, TableColumn } from "@/types";
 
 const levelLabel = {
@@ -22,13 +30,6 @@ const levelLabel = {
   medium: "중분류",
   small: "소분류",
 } satisfies Record<DataCodeLevel, string>;
-
-function createParentCode(code: string, level: DataCodeLevel) {
-  const normalized = code.trim().toUpperCase();
-  if (level === "large" || normalized.length < 3) return undefined;
-  if (level === "medium") return `${normalized.slice(0, 2)}000`;
-  return `${normalized.slice(0, 2)}${normalized.slice(2, 3)}00`;
-}
 
 export function DataCodePage() {
   const { toast } = useToast();
@@ -66,7 +67,7 @@ export function DataCodePage() {
         key: "createdAt",
         label: "등록일",
         width: "120px",
-        render: (value) => new Date(String(value)).toLocaleDateString("ko-KR"),
+        render: (value) => formatDate(String(value)),
       },
     ],
     [],
@@ -264,13 +265,27 @@ function DataCodeForm({
   const [sortOrder, setSortOrder] = useState(String(initialValue?.sortOrder ?? ""));
   const [description, setDescription] = useState(initialValue?.description ?? "");
   const [duplicateCheckCode, setDuplicateCheckCode] = useState("");
+  const [validationError, setValidationError] = useState("");
 
-  const expectedParentCode = createParentCode(code, level);
-  const effectiveParentCode = level === "large" ? undefined : parentCode || expectedParentCode;
-  const mediumParentCode = level === "small" ? formLargeCode || expectedParentCodeFromCode(code, "large") : "";
+  const normalizedCode = normalizeDataCode(code);
+  const effectiveParentCode = level === "large" ? undefined : parentCode;
+  const expectedParentCode = getExpectedParentCode(normalizedCode, level);
+  const expectedLargeCode = getExpectedLargeCode(normalizedCode);
+  const mediumParentCode = level === "small" ? formLargeCode : "";
   const mediumCodesQuery = useDataCodesQuery({ level: "medium", parentCode: mediumParentCode, pageSize: 100 });
   const duplicateQuery = useDataCodeDuplicateQuery(duplicateCheckCode, !!duplicateCheckCode, initialValue?.id);
   const mediumCodes = mediumCodesQuery.data?.data ?? [];
+  const codeChanged = normalizedCode !== (initialValue?.code ?? "");
+  const duplicateResultMatchesCode = duplicateQuery.data?.code === normalizedCode;
+  const duplicateCheckPassed = !codeChanged || (duplicateResultMatchesCode && !duplicateQuery.data?.exists);
+  const inputValidationMessage = validateDataCodeInput({ level, code: normalizedCode, parentCode: effectiveParentCode });
+  const submitDisabled =
+    !normalizedCode ||
+    !codeName.trim() ||
+    !sortOrder.trim() ||
+    Boolean(inputValidationMessage) ||
+    !duplicateCheckPassed ||
+    duplicateQuery.data?.exists === true;
 
   const reset = () => {
     setLevel("small");
@@ -281,6 +296,7 @@ function DataCodeForm({
     setSortOrder("");
     setDescription("");
     setDuplicateCheckCode("");
+    setValidationError("");
   };
 
   return (
@@ -288,14 +304,26 @@ function DataCodeForm({
       className="mt-4 flex flex-col gap-4"
       onSubmit={(event) => {
         event.preventDefault();
+        const nextValidationError = validateDataCodeInput({ level, code: normalizedCode, parentCode: effectiveParentCode });
+        if (nextValidationError) {
+          setValidationError(nextValidationError);
+          return;
+        }
+
+        if (!duplicateCheckPassed) {
+          setValidationError("코드 중복확인을 먼저 진행해주세요.");
+          return;
+        }
+
+        setValidationError("");
         onSubmit(
           {
             level,
             parentCode: effectiveParentCode,
-            code: code.trim().toUpperCase(),
-            codeName,
+            code: normalizedCode,
+            codeName: codeName.trim(),
             sortOrder: Number(sortOrder),
-            description,
+            description: description.trim(),
           },
           reset,
         );
@@ -310,6 +338,7 @@ function DataCodeForm({
             setFormLargeCode("");
             setParentCode("");
             setDuplicateCheckCode("");
+            setValidationError("");
           }}
           options={[
             { label: "대분류", value: "large" },
@@ -326,7 +355,10 @@ function DataCodeForm({
             codes={largeCodes}
             value={parentCode}
             placeholder="대분류 코드 또는 코드명 검색"
-            onChange={setParentCode}
+            onChange={(value) => {
+              setParentCode(value);
+              setValidationError("");
+            }}
           />
         </FormField>
       )}
@@ -342,6 +374,7 @@ function DataCodeForm({
               onChange={(value) => {
                 setFormLargeCode(value);
                 setParentCode("");
+                setValidationError("");
               }}
             />
           </FormField>
@@ -351,7 +384,10 @@ function DataCodeForm({
               codes={mediumCodes}
               value={parentCode}
               placeholder={formLargeCode ? "중분류 코드 또는 코드명 검색" : "대분류를 먼저 선택하세요"}
-              onChange={setParentCode}
+              onChange={(value) => {
+                setParentCode(value);
+                setValidationError("");
+              }}
             />
           </FormField>
         </>
@@ -365,26 +401,42 @@ function DataCodeForm({
               const nextCode = event.target.value.toUpperCase();
               setCode(nextCode);
               setDuplicateCheckCode("");
+              setValidationError("");
             }}
             placeholder="AE101"
+            error={Boolean(inputValidationMessage)}
           />
           <Button
             type="button"
             variant="outline"
-            onClick={() => setDuplicateCheckCode(code.trim().toUpperCase())}
-            disabled={!code.trim()}
+            onClick={() => {
+              setDuplicateCheckCode(normalizedCode);
+              setValidationError("");
+            }}
+            disabled={!normalizedCode || Boolean(inputValidationMessage)}
           >
             중복확인
           </Button>
         </div>
       </FormField>
 
-      {expectedParentCode && (
+      <p className={inputValidationMessage ? "text-xs text-danger-600" : "text-xs text-text-muted"}>
+        {inputValidationMessage ?? getDataCodeFormatHint(level)}
+      </p>
+      {level === "small" && expectedLargeCode && (
         <p className="text-xs text-text-muted">
-          입력 코드 기준 예상 상위 코드: <span className="font-semibold text-text">{expectedParentCode}</span>
+          코드 기준 대분류: <span className="font-semibold text-text">{expectedLargeCode}</span>
         </p>
       )}
-      {duplicateQuery.data && (
+      {expectedParentCode && (
+        <p className="text-xs text-text-muted">
+          코드 기준 상위 분류: <span className="font-semibold text-text">{expectedParentCode}</span>
+        </p>
+      )}
+      {normalizedCode && codeChanged && !duplicateQuery.data && !inputValidationMessage && (
+        <p className="text-xs text-warning-600">저장 전 코드 중복확인을 진행해주세요.</p>
+      )}
+      {duplicateQuery.data && duplicateResultMatchesCode && (
         <p className={duplicateQuery.data.exists ? "text-xs text-danger-600" : "text-xs text-success-600"}>
           {duplicateQuery.data.exists ? "이미 등록된 코드입니다." : "사용 가능한 코드입니다."}
         </p>
@@ -412,12 +464,12 @@ function DataCodeForm({
         {selectedMediumName && <span className="mt-1 block">현재 선택 중분류: {selectedMediumName}</span>}
       </div>
 
-      {errorMessage && <p className="text-xs text-danger-600">{errorMessage}</p>}
+      {(validationError || errorMessage) && <p className="text-xs text-danger-600">{validationError || errorMessage}</p>}
       <Button
         type="submit"
         leftIcon={<Plus aria-hidden="true" />}
         loading={loading}
-        disabled={!code.trim() || !codeName.trim() || !sortOrder.trim() || duplicateQuery.data?.exists === true}
+        disabled={submitDisabled}
       >
         {submitLabel}
       </Button>
@@ -458,10 +510,10 @@ function SearchableCodeSelect({
 }
 
 function expectedParentCodeFromCode(code: string, targetLevel: "large" | "medium") {
-  const normalized = code.trim().toUpperCase();
+  const normalized = normalizeDataCode(code);
   if (normalized.length < 3) return "";
-  if (targetLevel === "large") return `${normalized.slice(0, 2)}000`;
-  return `${normalized.slice(0, 2)}${normalized.slice(2, 3)}00`;
+  if (targetLevel === "large") return getExpectedLargeCode(normalized) ?? "";
+  return getExpectedParentCode(normalized, "small") ?? "";
 }
 
 function CodeColumn({

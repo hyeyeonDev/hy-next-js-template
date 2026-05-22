@@ -9,7 +9,9 @@ import { DataTable } from "@/components/data-display";
 import { FormField } from "@/components/forms";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { Badge, Button, Card, CardDescription, CardTitle, Input, Modal } from "@/components/ui";
+import { useDialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
+import { formatNumber } from "@/lib/format";
 import type { TableColumn } from "@/types";
 
 type LocaleOption = {
@@ -202,6 +204,7 @@ function getMissingCount(key: string, locales: LocaleOption[], dictionaries: Rec
 
 export function I18nAdminPage() {
   const { toast } = useToast();
+  const { confirm } = useDialog();
   const [payload, setPayload] = useState<I18nPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -336,7 +339,12 @@ export function I18nAdminPage() {
   }
 
   async function deleteLocale(localeCode: string) {
-    if (!window.confirm(`${localeCode} 언어를 삭제할까요?`)) return;
+    const ok = await confirm(`${localeCode} 언어를 삭제할까요?`, {
+      message: "삭제된 언어 사전은 다시 복구할 수 없습니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     setDeletingLocale(localeCode);
     try {
@@ -600,8 +608,8 @@ export function I18nAdminPage() {
                 <>
                   <p className="text-sm font-semibold text-text">업로드 검토</p>
                   <p className="mt-1 text-sm text-text-muted">
-                    {previewLocales.join(", ")} 언어, {previewKeyCount.toLocaleString()}개 키를 저장합니다.
-                    {missingImportKeyCount > 0 && ` 누락 ${missingImportKeyCount.toLocaleString()}개를 아래에서 입력할 수 있습니다.`}
+                    {previewLocales.join(", ")} 언어, {formatNumber(previewKeyCount)}개 키를 저장합니다.
+                    {missingImportKeyCount > 0 && ` 누락 ${formatNumber(missingImportKeyCount)}개를 아래에서 입력할 수 있습니다.`}
                   </p>
                 </>
               )}

@@ -18,8 +18,10 @@ import {
 } from "@/hooks/queries";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/data-display";
+import { useDialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card, Textarea } from "@/components/ui";
+import { formatDateTime, formatNumber } from "@/lib/format";
 import { isAdminRole } from "@/lib/roles";
 import type { ContentComment, ContentKind } from "@/types";
 
@@ -31,6 +33,7 @@ interface CommentThreadProps {
 
 export function CommentThread({ kind, contentId, allowReplies = true }: CommentThreadProps) {
   const { toast } = useToast();
+  const { confirm } = useDialog();
   const { user } = useAuth();
   const commentsQuery = useCommentsQuery(kind, contentId);
   const createComment = useCreateCommentMutation(kind, contentId);
@@ -93,7 +96,7 @@ export function CommentThread({ kind, contentId, allowReplies = true }: CommentT
             </span>
             <div className="min-w-0">
               <h3 className="text-base font-semibold text-text">댓글</h3>
-              <p className="mt-0.5 text-xs text-text-muted">{comments.length.toLocaleString()}개의 의견</p>
+              <p className="mt-0.5 text-xs text-text-muted">{formatNumber(comments.length)}개의 의견</p>
             </div>
           </div>
           {!allowReplies && <Badge variant="secondary">답글 비활성</Badge>}
@@ -161,7 +164,14 @@ export function CommentThread({ kind, contentId, allowReplies = true }: CommentT
               }}
               onChangeEdit={setEditingContent}
               onSubmitEdit={submitEdit}
-              onDelete={(id) => {
+              onDelete={async (id) => {
+                const ok = await confirm("댓글을 삭제할까요?", {
+                  message: "삭제된 댓글은 목록에서 제거됩니다.",
+                  variant: "danger",
+                  confirmLabel: "삭제",
+                });
+                if (!ok) return;
+
                 deleteComment.mutate(id, {
                   onSuccess: () => toast("댓글이 삭제되었습니다.", "danger"),
                 });
@@ -236,7 +246,7 @@ function CommentItem({
           <div className="min-w-0">
             <p className="text-sm font-semibold text-text">{comment.authorName}</p>
             <p className="mt-0.5 text-xs text-text-muted">
-              {new Date(comment.createdAt).toLocaleString("ko-KR")}
+              {formatDateTime(comment.createdAt)}
             </p>
           </div>
         </div>
@@ -334,7 +344,7 @@ function CommentItem({
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-text">{reply.authorName}</p>
                     <p className="mt-0.5 text-xs text-text-muted">
-                      {new Date(reply.createdAt).toLocaleString("ko-KR")}
+                      {formatDateTime(reply.createdAt)}
                     </p>
                   </div>
                 </div>

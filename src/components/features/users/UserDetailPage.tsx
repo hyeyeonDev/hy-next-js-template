@@ -8,12 +8,14 @@ import { useDeleteUserMutation, useUserQuery, useWithdrawUserMutation } from "@/
 import { RoleGuard } from "@/components/auth";
 import { LoadingState } from "@/components/data-display";
 import { AdminLayout, PageWrapper } from "@/components/layout";
+import { useDialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { Button, Card } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/hooks/useAuth";
+import { isAdminRole } from "@/lib/roles";
 
-import { UserProfileCard } from "./UserProfileCard";
-import { USER_DETAIL_CONTAINER_CLASS } from "./user-layout.constants";
+import { UserDetailSection } from "./UserDetailSection";
 
 interface UserDetailPageProps {
   id: number;
@@ -22,9 +24,12 @@ interface UserDetailPageProps {
 export function UserDetailPage({ id }: UserDetailPageProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useDialog();
+  const { user: currentUser } = useAuth();
   const userQuery = useUserQuery(id);
   const deleteUser = useDeleteUserMutation();
   const withdrawUser = useWithdrawUserMutation();
+  const canManageDanger = isAdminRole(currentUser?.role);
 
   return (
     <AdminLayout title="사용자권한 정보">
@@ -59,60 +64,66 @@ export function UserDetailPage({ id }: UserDetailPageProps) {
             )}
 
             {userQuery.data && (
-              <div className={USER_DETAIL_CONTAINER_CLASS}>
-                <UserProfileCard user={userQuery.data} readOnly canEditRole />
-
-                <RoleGuard roles={["ADMIN"]}>
-                  <div className="rounded-xl border border-danger-200 bg-danger-50 p-6 shadow-sm">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-danger-700">위험 작업</h3>
-                        <p className="mt-1 text-sm text-danger-600">
-                          탈퇴 처리는 계정 상태를 탈퇴로 변경합니다. 삭제는 사용자 데이터를 목록에서 제거합니다.
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        {userQuery.data.status !== "withdrawn" && (
-                          <Button
-                            size="lg"
-                            variant="warning"
-                            leftIcon={<UserMinus aria-hidden="true" />}
-                            loading={withdrawUser.isPending}
-                            onClick={() => {
-                              const ok = window.confirm("이 사용자를 탈퇴 처리할까요?");
-                              if (!ok) return;
-
-                              withdrawUser.mutate(id, {
-                                onSuccess: () => {
-                                  toast("사용자가 탈퇴 처리되었습니다.", "danger");
-                                },
-                              });
-                            }}
-                          >
-                            탈퇴 처리
-                          </Button>
-                        )}
+              <UserDetailSection
+                user={userQuery.data}
+                readOnly
+                canEditRole
+                dangerTitle={canManageDanger ? "위험 작업" : undefined}
+                dangerDescription={canManageDanger ? "탈퇴 처리는 계정 상태를 탈퇴로 변경합니다. 삭제는 사용자 데이터를 목록에서 제거합니다." : undefined}
+                dangerActions={
+                  canManageDanger ? (
+                    <>
+                      {userQuery.data.status !== "withdrawn" && (
                         <Button
                           size="lg"
-                          variant="danger"
-                          leftIcon={<Trash2 aria-hidden="true" />}
-                          loading={deleteUser.isPending}
-                          onClick={() => {
-                            deleteUser.mutate(id, {
+                          variant="warning"
+                          leftIcon={<UserMinus aria-hidden="true" />}
+                          loading={withdrawUser.isPending}
+                          onClick={async () => {
+                            const ok = await confirm("이 사용자를 탈퇴 처리할까요?", {
+                              message: "탈퇴 처리 후 해당 사용자는 일반 로그인과 서비스 이용이 제한됩니다.",
+                              variant: "danger",
+                              confirmLabel: "탈퇴 처리",
+                            });
+                            if (!ok) return;
+
+                            withdrawUser.mutate(id, {
                               onSuccess: () => {
-                                toast("사용자가 삭제되었습니다.", "danger");
-                                router.replace(ROUTES.USERS.ROOT);
+                                toast("사용자가 탈퇴 처리되었습니다.", "danger");
                               },
                             });
                           }}
                         >
-                          사용자 삭제
+                          탈퇴 처리
                         </Button>
-                      </div>
-                    </div>
-                  </div>
-                </RoleGuard>
-              </div>
+                      )}
+                      <Button
+                        size="lg"
+                        variant="danger"
+                        leftIcon={<Trash2 aria-hidden="true" />}
+                        loading={deleteUser.isPending}
+                        onClick={async () => {
+                          const ok = await confirm("사용자를 삭제할까요?", {
+                            message: "삭제된 사용자 데이터는 목록에서 제거됩니다. 이 작업은 되돌릴 수 없습니다.",
+                            variant: "danger",
+                            confirmLabel: "삭제",
+                          });
+                          if (!ok) return;
+
+                          deleteUser.mutate(id, {
+                            onSuccess: () => {
+                              toast("사용자가 삭제되었습니다.", "danger");
+                              router.replace(ROUTES.USERS.ROOT);
+                            },
+                          });
+                        }}
+                      >
+                        사용자 삭제
+                      </Button>
+                    </>
+                  ) : undefined
+                }
+              />
             )}
         </PageWrapper>
       </RoleGuard>

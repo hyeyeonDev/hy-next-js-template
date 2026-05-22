@@ -9,6 +9,7 @@ import { FormField, SearchInput } from "@/components/forms";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { Badge, Card, Select } from "@/components/ui";
 import { useLoginHistoryQuery } from "@/hooks/queries";
+import { formatDateTime } from "@/lib/format";
 import type { LoginHistory, TableColumn } from "@/types";
 
 export function LoginHistoryPage() {
@@ -46,7 +47,7 @@ export function LoginHistoryPage() {
         key: "createdAt",
         label: "로그인 시각",
         width: "170px",
-        render: (value) => new Date(String(value)).toLocaleString("ko-KR"),
+        render: (value) => formatDateTime(String(value)),
       },
     ],
     [],

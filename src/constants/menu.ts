@@ -69,6 +69,7 @@ export const ADMIN_MENU: Array<MenuItemConfig | MenuGroupConfig> = [
     feature: FEATURE_KEYS.MY_PAGE,
     icon: UserRound,
     exact: true,
+    activePaths: [ROUTES.MY_PAGE],
   },
   {
     labelKey: "nav.userManagement",

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui";
+import { formatDateTime } from "@/lib/format";
 import type { UpdateUserDto, User } from "@/types";
 
 import { UserForm } from "./UserForm";
@@ -13,11 +14,6 @@ interface UserProfileCardProps {
   canEditStatus?: boolean;
   showAccountFields?: boolean;
   onSubmit?: (value: UpdateUserDto) => void;
-}
-
-function formatDate(value?: string) {
-  if (!value) return "-";
-  return new Date(value).toLocaleString("ko-KR");
 }
 
 export function UserProfileCard({
@@ -59,11 +55,11 @@ export function UserProfileCard({
           <dl className="mt-6 grid grid-cols-1 gap-3 border-t border-border pt-5 sm:grid-cols-2">
             <div className="rounded-md bg-surface-2 p-3">
               <dt className="text-xs text-text-muted">가입일</dt>
-              <dd className="mt-1 text-sm font-medium text-text">{formatDate(user.createdAt)}</dd>
+              <dd className="mt-1 text-sm font-medium text-text">{formatDateTime(user.createdAt)}</dd>
             </div>
             <div className="rounded-md bg-surface-2 p-3">
               <dt className="text-xs text-text-muted">최근 수정일</dt>
-              <dd className="mt-1 text-sm font-medium text-text">{formatDate(user.updatedAt)}</dd>
+              <dd className="mt-1 text-sm font-medium text-text">{formatDateTime(user.updatedAt)}</dd>
             </div>
           </dl>
         )}

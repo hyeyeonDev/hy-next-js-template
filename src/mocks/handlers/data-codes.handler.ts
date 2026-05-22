@@ -1,4 +1,5 @@
 import type { CreateDataCodeDto, DataCode, DataCodeListParams, UpdateDataCodeDto } from "@/types";
+import { getExpectedParentCode, normalizeDataCode, validateDataCodeInput } from "@/lib/data-code";
 
 import { fail, getId, ok, page, type MockRequest } from "../mock-utils";
 import { mockStore } from "../mock-store";
@@ -36,6 +37,9 @@ function checkDuplicate(code: string, excludeId?: number) {
 }
 
 function validateParent(dto: CreateDataCodeDto) {
+  const validationMessage = validateDataCodeInput({ level: dto.level, code: dto.code, parentCode: dto.parentCode });
+  if (validationMessage) fail(400, validationMessage);
+
   if (dto.level === "large" && dto.parentCode) {
     fail(400, "대분류는 상위 코드를 선택하지 않습니다.");
   }
@@ -47,16 +51,18 @@ function validateParent(dto: CreateDataCodeDto) {
   if (dto.level === "medium") {
     const parent = mockStore.dataCodes.find((item) => item.code === dto.parentCode && item.level === "large");
     if (!parent) fail(400, "대분류를 먼저 선택해주세요.");
+    if (dto.parentCode !== getExpectedParentCode(dto.code, dto.level)) fail(400, "코드와 대분류가 일치하지 않습니다.");
   }
 
   if (dto.level === "small") {
     const parent = mockStore.dataCodes.find((item) => item.code === dto.parentCode && item.level === "medium");
     if (!parent) fail(400, "중분류를 먼저 선택해주세요.");
+    if (dto.parentCode !== getExpectedParentCode(dto.code, dto.level)) fail(400, "코드와 중분류가 일치하지 않습니다.");
   }
 }
 
 function createDataCode(dto: CreateDataCodeDto) {
-  const code = dto.code.trim().toUpperCase();
+  const code = normalizeDataCode(dto.code);
   const codeName = dto.codeName.trim();
   const sortOrder = Number(dto.sortOrder);
 
@@ -92,7 +98,7 @@ function updateDataCode(id: number, dto: UpdateDataCodeDto) {
   if (!target) fail(404, "코드를 찾을 수 없습니다.");
 
   const nextLevel = dto.level ?? target.level;
-  const nextCode = dto.code?.trim().toUpperCase() ?? target.code;
+  const nextCode = dto.code ? normalizeDataCode(dto.code) : target.code;
   const nextCodeName = dto.codeName?.trim() ?? target.codeName;
   const nextSortOrder = dto.sortOrder ?? target.sortOrder;
 
@@ -102,6 +108,10 @@ function updateDataCode(id: number, dto: UpdateDataCodeDto) {
 
   if (mockStore.dataCodes.some((item) => item.id !== id && item.code === nextCode)) {
     fail(409, "이미 등록된 코드입니다.");
+  }
+
+  if (mockStore.dataCodes.some((item) => item.parentCode === target.code) && (target.code !== nextCode || target.level !== nextLevel)) {
+    fail(400, "하위 코드가 있는 분류는 코드값 또는 분류 단계를 변경할 수 없습니다.");
   }
 
   validateParent({
@@ -118,6 +128,7 @@ function updateDataCode(id: number, dto: UpdateDataCodeDto) {
     level: nextLevel,
     code: nextCode,
     codeName: nextCodeName,
+    sortOrder: Number(nextSortOrder),
     description: dto.description?.trim(),
     parentCode: nextLevel === "large" ? undefined : dto.parentCode ?? target.parentCode,
     updatedAt: new Date().toISOString(),

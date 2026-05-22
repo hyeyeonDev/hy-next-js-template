@@ -8,9 +8,11 @@ import { useContentQuery, useDeleteContentMutation } from "@/hooks/queries";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/data-display";
 import { AdminLayout, PageWrapper } from "@/components/layout";
+import { useDialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card } from "@/components/ui";
 import { useI18n } from "@/i18n";
+import { formatDate, formatNumber } from "@/lib/format";
 import { isAdminRole } from "@/lib/roles";
 import type { ContentKind } from "@/types";
 
@@ -27,6 +29,7 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
   const meta = getContentMeta(kind, t);
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useDialog();
   const { user } = useAuth();
   const detailQuery = useContentQuery(kind, id);
   const deleteContent = useDeleteContentMutation(kind);
@@ -55,7 +58,14 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
               variant="danger"
               leftIcon={<Trash2 aria-hidden="true" />}
               loading={deleteContent.isPending}
-              onClick={() => {
+              onClick={async () => {
+                const ok = await confirm("게시글을 삭제할까요?", {
+                  message: "삭제된 게시글은 목록에서 제거됩니다.",
+                  variant: "danger",
+                  confirmLabel: "삭제",
+                });
+                if (!ok) return;
+
                 deleteContent.mutate(id, {
                   onSuccess: () => {
                     toast("삭제되었습니다.", "danger");
@@ -100,8 +110,8 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                   <h2 className="text-xl font-semibold text-text">{detailQuery.data.title}</h2>
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
                     <span>{t("content.writer")} {detailQuery.data.authorName}</span>
-                    <span>{t("table.views")} {detailQuery.data.viewCount.toLocaleString()}</span>
-                    <span>{t("content.createdAt")} {new Date(detailQuery.data.createdAt).toLocaleDateString(locale === "EN" ? "en-US" : "ko-KR")}</span>
+                    <span>{t("table.views")} {formatNumber(detailQuery.data.viewCount, locale)}</span>
+                    <span>{t("content.createdAt")} {formatDate(detailQuery.data.createdAt, locale)}</span>
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap py-6 text-sm leading-7 text-text">{detailQuery.data.content}</div>

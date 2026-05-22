@@ -22,6 +22,7 @@ export interface ContentListParams {
   search?: string;
   status?: ContentStatus;
   category?: string;
+  authorId?: number;
 }
 
 export interface CreateContentDto {

@@ -10,6 +10,7 @@ import { AdminLayout, PageWrapper } from "@/components/layout";
 import { Badge, Button, Card, Checkbox, Input, Textarea } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
 import { useCreateOrganizationMutation, useOrganizationsQuery, useUpdateOrganizationMutation } from "@/hooks/queries";
+import { formatDate } from "@/lib/format";
 import type { Organization, TableColumn } from "@/types";
 
 export function OrganizationPage() {
@@ -41,7 +42,7 @@ export function OrganizationPage() {
         key: "createdAt",
         label: "등록일",
         width: "120px",
-        render: (value) => new Date(String(value)).toLocaleDateString("ko-KR"),
+        render: (value) => formatDate(String(value)),
       },
     ],
     [],

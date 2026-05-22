@@ -39,8 +39,9 @@ function listContents(kind: ContentKind, params: ContentListParams = {}) {
         item.authorName.toLowerCase().includes(search);
       const matchesStatus = !params.status || item.status === params.status;
       const matchesCategory = !params.category || item.category === params.category;
+      const matchesAuthor = params.authorId === undefined || item.authorId === Number(params.authorId);
 
-      return matchesSearch && matchesStatus && matchesCategory;
+      return matchesSearch && matchesStatus && matchesCategory && matchesAuthor;
     })
     .sort((a, b) => Number(!!b.isPinned) - Number(!!a.isPinned) || b.id - a.id);
 
