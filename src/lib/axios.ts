@@ -1,6 +1,7 @@
 import { env } from "./env";
 import { handleMockRequest } from "@/mocks/mock-api";
 import { AppError, createApiError, createNetworkError } from "./errors";
+import { clearAuthTokens, getAuthorizationHeader, persistAuthToken } from "./auth";
 
 export interface ApiError {
   status: number;
@@ -13,6 +14,7 @@ type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 interface RequestConfig {
   params?: object;
   headers?: Record<string, string>;
+  skipAuthRefresh?: boolean;
 }
 
 interface ApiClientConfig {
@@ -74,6 +76,7 @@ function createApiClient(config: ApiClientConfig) {
     url: string,
     body?: D,
     requestConfig?: RequestConfig,
+    hasRetried = false,
   ): Promise<ClientResponse<T>> {
     try {
       if (config.useMock) {
@@ -92,6 +95,7 @@ function createApiClient(config: ApiClientConfig) {
         () => controller.abort(),
         config.timeout ?? 15_000,
       );
+      const authorization = getAuthorizationHeader();
 
       const response = await fetch(
         buildUrl(config.baseURL, url, requestConfig?.params),
@@ -99,6 +103,7 @@ function createApiClient(config: ApiClientConfig) {
           method,
           headers: {
             "Content-Type": "application/json",
+            ...(authorization ? { Authorization: authorization } : {}),
             ...config.headers,
             ...requestConfig?.headers,
           },
@@ -114,6 +119,14 @@ function createApiClient(config: ApiClientConfig) {
         message?: string;
         errors?: Record<string, string[]>;
       };
+
+      if (response.status === 401 && !hasRetried && !requestConfig?.skipAuthRefresh && url !== "/auth/refresh") {
+        const refreshed = await refreshAccessToken(config);
+
+        if (refreshed) {
+          return request<T, D>(method, url, body, requestConfig, true);
+        }
+      }
 
       if (!response.ok) {
         throw createApiError({
@@ -149,6 +162,37 @@ function createApiClient(config: ApiClientConfig) {
     delete: <T = void>(url: string, requestConfig?: RequestConfig) =>
       request<T>("DELETE", url, undefined, requestConfig),
   };
+}
+
+async function refreshAccessToken(config: ApiClientConfig) {
+  try {
+    const response = await fetch(buildUrl(config.baseURL, "/auth/refresh"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...config.headers,
+      },
+      credentials: config.withCredentials ? "include" : "same-origin",
+    });
+
+    const data = (await response.json().catch(() => null)) as {
+      data?: { accessToken?: string };
+      accessToken?: string;
+    } | null;
+
+    const accessToken = data?.data?.accessToken ?? data?.accessToken;
+
+    if (!response.ok) {
+      clearAuthTokens();
+      return false;
+    }
+
+    persistAuthToken(accessToken);
+    return true;
+  } catch {
+    clearAuthTokens();
+    return false;
+  }
 }
 
 export const apiClient = createApiClient({

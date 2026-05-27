@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Paperclip, Trash2 } from "lucide-react";
 
 import { useContentQuery, useDeleteContentMutation } from "@/hooks/queries";
 import { useAuth } from "@/hooks/useAuth";
-import { LoadingState } from "@/components/data-display";
+import { LoadingState, RichTextContent } from "@/components/data-display";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useDialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
 import { Badge, Button, Card } from "@/components/ui";
 import { useI18n } from "@/i18n";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatDate, formatFileSize, formatNumber } from "@/lib/format";
 import { isAdminRole } from "@/lib/roles";
 import type { ContentKind } from "@/types";
 
@@ -106,6 +106,7 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                       {getContentStatusLabel(detailQuery.data.status, t)}
                     </Badge>
                     {detailQuery.data.isPinned && <Badge variant="primary">{t("content.pinned")}</Badge>}
+                    {detailQuery.data.isPopup && <Badge variant="warning">팝업</Badge>}
                   </div>
                   <h2 className="text-xl font-semibold text-text">{detailQuery.data.title}</h2>
                   <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
@@ -114,7 +115,32 @@ export function ContentDetailPage({ kind, id }: ContentDetailPageProps) {
                     <span>{t("content.createdAt")} {formatDate(detailQuery.data.createdAt, locale)}</span>
                   </div>
                 </div>
-                <div className="whitespace-pre-wrap py-6 text-sm leading-7 text-text">{detailQuery.data.content}</div>
+                <RichTextContent content={detailQuery.data.content} />
+                {!!detailQuery.data.attachments?.length && (
+                  <div className="border-t border-border py-4">
+                    <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-text">
+                      <Paperclip className="h-4 w-4 text-text-subtle" aria-hidden="true" />
+                      첨부파일
+                    </div>
+                    <ul className="flex flex-col gap-2">
+                      {detailQuery.data.attachments.map((file) => (
+                        <li
+                          key={`${file.name}-${file.size}`}
+                          className="flex items-center justify-between gap-3 rounded-md bg-surface-2 px-3 py-2 text-sm"
+                        >
+                          {file.url ? (
+                            <Link className="min-w-0 truncate text-primary-600 hover:underline" href={file.url}>
+                              {file.name}
+                            </Link>
+                          ) : (
+                            <span className="min-w-0 truncate text-text-muted">{file.name}</span>
+                          )}
+                          <span className="shrink-0 text-xs text-text-subtle">{formatFileSize(file.size)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </Card>
               {meta.allowComments && (
                 <CommentThread kind={kind} contentId={id} allowReplies={meta.allowReplies} />

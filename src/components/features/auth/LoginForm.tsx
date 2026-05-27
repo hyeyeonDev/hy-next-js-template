@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthSession } from "@/hooks";
 import { Button } from "@/components/ui/Button";
 import { FormField, EmailField, PasswordField } from "@/components/forms";
+import { persistAuthToken } from "@/lib/auth";
 
 interface LoginFormProps {
   redirectTo?: string | null;
@@ -27,7 +28,7 @@ export function LoginForm({ redirectTo, onSuccess }: LoginFormProps) {
           { email, password },
           {
             onSuccess: (data) => {
-              document.cookie = `access_token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+              persistAuthToken(data.accessToken);
               markLoggedIn();
               router.replace(getReturnPath(redirectTo));
               router.refresh();

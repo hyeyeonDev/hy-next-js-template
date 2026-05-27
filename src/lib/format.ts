@@ -33,3 +33,9 @@ export function formatDateTime(value?: string | number | Date, locale?: LocaleCo
 export function formatNumber(value: number, locale?: LocaleCode) {
   return new Intl.NumberFormat(normalizeLocale(locale)).format(value);
 }
+
+export function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}

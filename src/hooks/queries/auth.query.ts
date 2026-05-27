@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { authService } from "@/api/auth.api";
 import { QUERY_KEYS } from "@/constants/queryKeys";
+import { clearAuthTokens } from "@/lib/auth";
 
 export function useMeQuery() {
   return useQuery({
@@ -66,7 +67,7 @@ export function useWithdrawMeMutation() {
   return useMutation({
     mutationFn: authService.withdrawMe,
     onSuccess: () => {
-      document.cookie = "access_token=; path=/; max-age=0; SameSite=Lax";
+      clearAuthTokens();
       queryClient.clear();
     },
   });
@@ -78,7 +79,7 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
-      document.cookie = "access_token=; path=/; max-age=0; SameSite=Lax";
+      clearAuthTokens();
       queryClient.clear();
     },
   });

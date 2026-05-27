@@ -10,6 +10,7 @@ import { ROUTES } from "@/constants/routes";
 import { useContentsQuery, useMeQuery } from "@/hooks/queries";
 import { useI18n } from "@/i18n";
 import { formatDate, formatNumber } from "@/lib/format";
+import { stripHtml } from "@/lib/rich-text";
 import type { ContentItem, ContentKind, User } from "@/types";
 
 import { getContentMeta, getContentStatusLabel } from "../content/content-meta";
@@ -161,7 +162,7 @@ function MyContentItem({
             </Badge>
           </div>
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-          <p className="mt-1 truncate text-xs text-text-muted">{item.category || item.content}</p>
+          <p className="mt-1 truncate text-xs text-text-muted">{item.category || stripHtml(item.content)}</p>
         </div>
         <span className="shrink-0 text-xs text-text-muted">{formatDate(item.createdAt, dateLocale)}</span>
       </div>

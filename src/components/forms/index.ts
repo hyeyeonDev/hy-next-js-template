@@ -17,6 +17,7 @@ export * from "./FileUploadField";
 export * from "./TagInput";
 export * from "./AutoComplete";
 export * from "./FormProvider";
+export * from "./RichTextEditor";
 
 /**
  * =========================================================

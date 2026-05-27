@@ -4,18 +4,16 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Edit, Pin, Plus } from "lucide-react";
 
-import { useContentsQuery, useCreateContentMutation } from "@/hooks/queries";
+import { useContentsQuery } from "@/hooks/queries";
 import { useAuth } from "@/hooks/useAuth";
-import { Badge, Button, Card, Modal } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 import { DataTable } from "@/components/data-display";
-import { useToast } from "@/components/ui/toast";
 import { FormField, SearchInput } from "@/components/forms";
 import { AdminLayout, PageWrapper } from "@/components/layout";
 import { useI18n } from "@/i18n";
 import { isAdminRole } from "@/lib/roles";
 import type { ContentItem, ContentKind, TableColumn } from "@/types";
 
-import { ContentForm } from "./ContentForm";
 import { getContentMeta, getContentStatusLabel } from "./content-meta";
 
 interface ContentListPageProps {
@@ -28,14 +26,11 @@ const actionLinkClass =
 export function ContentListPage({ kind }: ContentListPageProps) {
   const { t } = useI18n();
   const meta = getContentMeta(kind, t);
-  const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [createOpen, setCreateOpen] = useState(false);
   const { user } = useAuth();
 
   const listQuery = useContentsQuery(kind, { page, pageSize: 10, search });
-  const createContent = useCreateContentMutation(kind);
 
   const columns = useMemo<TableColumn<ContentItem>[]>(() => {
     const baseColumns: TableColumn<ContentItem>[] = [
@@ -94,9 +89,13 @@ export function ContentListPage({ kind }: ContentListPageProps) {
         title={meta.title}
         description={meta.description}
         actions={
-        <Button leftIcon={<Plus aria-hidden="true" />} onClick={() => setCreateOpen(true)}>
-          {meta.createLabel}
-        </Button>
+          <Link
+            href={`${meta.path}/new`}
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {meta.createLabel}
+          </Link>
         }
       >
         <Card className="mb-4">
@@ -130,20 +129,6 @@ export function ContentListPage({ kind }: ContentListPageProps) {
         />
 
         {listQuery.isError && <p className="mt-3 text-sm text-danger-600">{listQuery.error.message}</p>}
-
-        <Modal open={createOpen} onClose={() => setCreateOpen(false)} title={meta.createLabel} size="lg">
-          <ContentForm
-            loading={createContent.isPending}
-            onSubmit={(value) => {
-              createContent.mutate(value, {
-                onSuccess: () => {
-                  setCreateOpen(false);
-                  toast("저장되었습니다.", "success");
-                },
-              });
-            }}
-          />
-        </Modal>
       </PageWrapper>
     </AdminLayout>
   );

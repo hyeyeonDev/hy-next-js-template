@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getSafeReturnPath } from "@/lib/auth-redirect";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/auth";
 import { isRouteFeatureEnabled } from "@/lib/feature-flags";
 
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/logout", "/find-id", "/find-password", "/storybook", "/error-preview", "/not-found"];
@@ -22,15 +23,18 @@ export function proxy(request: NextRequest) {
   }
 
   const isProtected = !isPublicRoute(pathname);
-  const token = request.cookies.get("access_token")?.value;
+  const hasAuthToken = Boolean(
+    request.cookies.get(ACCESS_TOKEN_KEY)?.value ||
+      request.cookies.get(REFRESH_TOKEN_KEY)?.value,
+  );
 
-  if (isProtected && !token) {
+  if (isProtected && !hasAuthToken) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", `${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname === "/login" && token) {
+  if (pathname === "/login" && hasAuthToken) {
     const nextPath = getSafeReturnPath(request.nextUrl.searchParams.get("next"));
     return NextResponse.redirect(new URL(nextPath, request.url));
   }

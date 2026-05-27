@@ -11,9 +11,18 @@ export interface ContentItem {
   status: ContentStatus;
   category?: string;
   isPinned?: boolean;
+  isPopup?: boolean;
+  attachments?: ContentAttachment[];
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ContentAttachment {
+  name: string;
+  size: number;
+  type?: string;
+  url?: string;
 }
 
 export interface ContentListParams {
@@ -31,6 +40,8 @@ export interface CreateContentDto {
   category?: string;
   status?: ContentStatus;
   isPinned?: boolean;
+  isPopup?: boolean;
+  attachments?: ContentAttachment[];
 }
 
 export type UpdateContentDto = Partial<CreateContentDto>;

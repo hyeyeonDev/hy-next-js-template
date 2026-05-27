@@ -13,6 +13,7 @@ export const ROUTES = {
 
   DASHBOARD: "/dashboard",
   DIGITAL_MAP: "/digital-map",
+  DIGITAL_MAP_FULL: "/digital-map/full",
   MY_PAGE: "/mypage",
   MY_PROFILE: "/mypage/profile",
   ORGANIZATIONS: "/organizations",

@@ -7,6 +7,7 @@ import { useAuthSession } from "@/hooks";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { EmailField, FormField, PasswordField } from "@/components/forms";
+import { persistAuthToken } from "@/lib/auth";
 
 interface SignupFormProps {
   redirectTo?: string | null;
@@ -28,7 +29,7 @@ export function SignupForm({ redirectTo }: SignupFormProps) {
           { name, email, password },
           {
             onSuccess: (data) => {
-              document.cookie = `access_token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+              persistAuthToken(data.accessToken);
               markLoggedIn();
               router.replace(getReturnPath(redirectTo));
               router.refresh();

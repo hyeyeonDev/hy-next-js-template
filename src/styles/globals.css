@@ -286,6 +286,11 @@
   border: 0;
 }
 
+.dgis-ag-grid .ag-root-wrapper,
+.dgis-ag-grid .ag-root {
+  overflow: hidden;
+}
+
 .dgis-ag-grid .ag-header-cell-label {
   font-size: 0.75rem;
   font-weight: 700;
@@ -308,8 +313,14 @@
 }
 
 .dgis-ag-grid .ag-paging-panel {
-  border-top-color: var(--color-border);
+  border-top: 1px solid var(--color-border);
   color: var(--color-text-muted);
+}
+
+.dgis-ag-grid .ag-center-cols-viewport,
+.dgis-ag-grid .ag-center-cols-container,
+.dgis-ag-grid .ag-body-horizontal-scroll {
+  border-bottom: 0;
 }
 
 .dgis-ag-grid .dgis-ag-cell-center {
@@ -330,4 +341,55 @@
 .dgis-ag-grid .ag-overlay-no-rows-center {
   color: var(--color-text-muted);
   font-size: 0.875rem;
+}
+
+.rich-text-editor .sun-editor {
+  overflow: hidden;
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.rich-text-editor .sun-editor .se-toolbar {
+  outline: 0;
+  background: var(--color-surface-2);
+}
+
+.rich-text-editor .sun-editor .se-wrapper {
+  background: var(--color-surface);
+}
+
+.rich-text-editor .sun-editor-editable {
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.rich-text-content > * + * {
+  margin-top: 0.75rem;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 1.25rem;
+}
+
+.rich-text-content ul {
+  list-style: disc;
+}
+
+.rich-text-content ol {
+  list-style: decimal;
+}
+
+.rich-text-content a {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
 }

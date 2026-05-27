@@ -60,6 +60,8 @@ function createContent(kind: ContentKind, dto: CreateContentDto) {
     status: dto.status ?? "published",
     category: dto.category,
     isPinned: dto.isPinned ?? false,
+    isPopup: dto.isPopup ?? false,
+    attachments: dto.attachments ?? [],
     viewCount: 0,
     createdAt: now,
     updatedAt: now,

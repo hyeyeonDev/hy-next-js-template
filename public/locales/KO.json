@@ -19,6 +19,8 @@
   "common.failed": "실패",
   "nav.dashboard": "대시보드",
   "nav.digitalMap": "Digital Map",
+  "nav.digitalMapPage": "페이지 보기",
+  "nav.digitalMapPopup": "팝업 보기",
   "nav.myPage": "마이페이지",
   "nav.userManagement": "사용자 관리",
   "nav.userPermissions": "사용자권한 정보",

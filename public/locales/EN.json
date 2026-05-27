@@ -19,6 +19,8 @@
   "common.failed": "Failed",
   "nav.dashboard": "Dashboard",
   "nav.digitalMap": "Digital Map",
+  "nav.digitalMapPage": "Page View",
+  "nav.digitalMapPopup": "Popup View",
   "nav.myPage": "My Page",
   "nav.userManagement": "User Management",
   "nav.userPermissions": "User Permissions",

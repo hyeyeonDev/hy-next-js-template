@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "suneditor/dist/css/suneditor.min.css";
 import "@/styles/globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { DialogProvider } from "@/components/ui/dialog";

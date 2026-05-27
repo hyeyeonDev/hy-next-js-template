@@ -11,3 +11,17 @@ export function isAdminRole(role?: UserRole | null) {
 export function isManagerRole(role?: UserRole | null) {
   return role === "MANAGER";
 }
+
+export function hasRole(role: UserRole | undefined | null, requiredRole: UserRole) {
+  if (!role) return false;
+
+  if (requiredRole === "ADMIN") {
+    return isAdminRole(role);
+  }
+
+  return role === requiredRole;
+}
+
+export function hasAnyRole(role: UserRole | undefined | null, requiredRoles: readonly UserRole[]) {
+  return requiredRoles.some((requiredRole) => hasRole(role, requiredRole));
+}

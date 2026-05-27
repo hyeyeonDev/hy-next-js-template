@@ -57,11 +57,23 @@ export const ADMIN_MENU: Array<MenuItemConfig | MenuGroupConfig> = [
   },
   {
     labelKey: "nav.digitalMap",
-    href: ROUTES.DIGITAL_MAP,
-    feature: FEATURE_KEYS.DIGITAL_MAP,
     icon: Map,
-    popup: { width: 1280, height: 820 },
-    quickDescriptionKey: "quick.digitalMap",
+    children: [
+      {
+        labelKey: "nav.digitalMapPage",
+        href: ROUTES.DIGITAL_MAP_FULL,
+        feature: FEATURE_KEYS.DIGITAL_MAP,
+        icon: Map,
+        quickDescriptionKey: "quick.digitalMap",
+      },
+      {
+        labelKey: "nav.digitalMapPopup",
+        href: ROUTES.DIGITAL_MAP,
+        feature: FEATURE_KEYS.DIGITAL_MAP,
+        icon: Map,
+        popup: { width: 1280, height: 820 },
+      },
+    ],
   },
   {
     labelKey: "nav.myPage",

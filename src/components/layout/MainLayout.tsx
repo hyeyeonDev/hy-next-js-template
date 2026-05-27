@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Palette, Settings } from "lucide-react";
 
-import { getAdminHeaderTitle, getAdminSidebarItems, isStorybookMenuEnabled } from "@/constants/menu";
+import {
+  getAdminHeaderTitle,
+  getAdminSidebarItems,
+  isStorybookMenuEnabled,
+} from "@/constants/menu";
 import { ROUTES } from "@/constants/routes";
 import { useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -28,7 +32,14 @@ interface MainLayoutProps {
   contentClassName?: string;
 }
 
-export function MainLayout({ children, sidebar, topbar, footer, className, contentClassName }: MainLayoutProps) {
+export function MainLayout({
+  children,
+  sidebar,
+  topbar,
+  footer,
+  className,
+  contentClassName,
+}: MainLayoutProps) {
   const pathname = usePathname();
   const { t } = useI18n();
   const defaultSidebarItems = getAdminSidebarItems(t);
@@ -64,12 +75,18 @@ export function MainLayout({ children, sidebar, topbar, footer, className, conte
   const resolvedFooter = footer ?? <Footer />;
 
   return (
-    <div className={cn("flex h-screen overflow-hidden bg-bg", className)}>
-      <Sidebar logo={resolvedSidebar.logo} items={resolvedSidebar.items} footer={resolvedSidebar.footer} />
+    <div className={cn("fixed inset-0 flex overflow-hidden bg-bg", className)}>
+      <Sidebar
+        logo={resolvedSidebar.logo}
+        items={resolvedSidebar.items}
+        footer={resolvedSidebar.footer}
+      />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="shrink-0">{resolvedTopbar}</div>
-        <main className={cn("min-h-0 flex-1 overflow-y-auto p-6", contentClassName)}>{children}</main>
-        <div className="shrink-0">{resolvedFooter}</div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <main className={cn("flex-1 p-6", contentClassName)}>{children}</main>
+          <div className="shrink-0">{resolvedFooter}</div>
+        </div>
       </div>
     </div>
   );

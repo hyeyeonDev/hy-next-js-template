@@ -112,7 +112,11 @@ function getInitialMapState() {
   };
 }
 
-export function DigitalMapPage() {
+interface DigitalMapPageProps {
+  variant?: "popup" | "embedded";
+}
+
+export function DigitalMapPage({ variant = "popup" }: DigitalMapPageProps) {
   const [initialState] = useState(getInitialMapState);
   const [activeTab, setActiveTab] = useState<LeftTab>(initialState.activeTab);
   const [keyword, setKeyword] = useState(initialState.keyword);
@@ -134,8 +138,10 @@ export function DigitalMapPage() {
 
   const visibleMarkers = activeTab === "project" ? projectItems : testItems;
 
+  const isEmbedded = variant === "embedded";
+
   return (
-    <main className="relative h-screen overflow-hidden bg-[#dce7df] text-text">
+    <main className={cn("relative min-h-0 overflow-hidden bg-[#dce7df] text-text", isEmbedded ? "flex-1" : "h-screen")}>
         <div
           className={cn(
             "absolute inset-0 transition-colors",
@@ -155,22 +161,24 @@ export function DigitalMapPage() {
           <div className="absolute bottom-[10%] left-[24%] h-28 w-[48%] rotate-[8deg] rounded-full border-8 border-success-300/35" />
         </div>
 
-        <header className="absolute left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b border-white/30 bg-surface/90 px-4 shadow-sm backdrop-blur">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-600 text-white">
-              <Map className="h-4 w-4" aria-hidden="true" />
-            </span>
-            <div>
-              <h1 className="text-sm font-semibold text-text">Digital Map</h1>
-              <p className="text-xs text-text-muted">프로젝트 위치와 시험 정보를 지도에서 확인합니다.</p>
+        {!isEmbedded && (
+          <header className="absolute left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b border-white/30 bg-surface/90 px-4 shadow-sm backdrop-blur">
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-600 text-white">
+                <Map className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div>
+                <h1 className="text-sm font-semibold text-text">Digital Map</h1>
+                <p className="text-xs text-text-muted">프로젝트 위치와 시험 정보를 지도에서 확인합니다.</p>
+              </div>
             </div>
-          </div>
-          <Button variant="outline" size="sm" leftIcon={<X className="h-4 w-4" />} onClick={() => window.close()}>
-            닫기
-          </Button>
-        </header>
+            <Button variant="outline" size="sm" leftIcon={<X className="h-4 w-4" />} onClick={() => window.close()}>
+              닫기
+            </Button>
+          </header>
+        )}
 
-        <aside className="absolute bottom-4 left-4 top-[4.5rem] z-10 flex w-[22rem] flex-col rounded-lg border border-border bg-surface/95 shadow-lg backdrop-blur">
+        <aside className={cn("absolute bottom-4 left-4 z-10 flex min-h-0 w-80 max-w-[calc(100%-2rem)] flex-col rounded-lg border border-border bg-surface/95 shadow-lg backdrop-blur xl:w-[22rem]", isEmbedded ? "top-4" : "top-[4.5rem]")}>
           <div className="grid grid-cols-2 border-b border-border p-2">
             <button
               className={cn(
@@ -207,7 +215,7 @@ export function DigitalMapPage() {
               leftIcon={<Search aria-hidden="true" />}
             />
           </div>
-          <div className="flex-1 overflow-y-auto p-3">
+          <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="mb-2 flex items-center justify-between text-xs text-text-muted">
               <span>{activeTab === "project" ? "프로젝트 목록" : "시험 목록"}</span>
               <span>{filteredItems.length}건</span>
@@ -243,7 +251,7 @@ export function DigitalMapPage() {
           </div>
         </aside>
 
-        <section className="absolute right-4 top-[4.5rem] z-10 w-48 rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">
+        <section className={cn("absolute right-4 z-10 max-h-[calc(100%-2rem)] w-48 max-w-[calc(100%-2rem)] overflow-y-auto rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur", isEmbedded ? "top-4" : "top-[4.5rem]")}>
           <p className="mb-2 text-xs font-semibold text-text-muted">지도 도구</p>
           <div className="grid grid-cols-2 gap-2">
             <ToolButton
@@ -289,7 +297,7 @@ export function DigitalMapPage() {
           </div>
         </section>
 
-        <section className="absolute bottom-4 right-4 z-10 w-72 rounded-lg border border-border bg-surface/95 p-4 shadow-lg backdrop-blur">
+        <section className="absolute bottom-4 right-4 z-10 max-h-[calc(100%-2rem)] w-72 max-w-[calc(100%-2rem)] overflow-y-auto rounded-lg border border-border bg-surface/95 p-4 shadow-lg backdrop-blur">
           <div className="flex items-center gap-2">
             <LocateFixed className="h-4 w-4 text-primary-600" aria-hidden="true" />
             <h2 className="text-sm font-semibold text-text">선택 정보</h2>
@@ -318,13 +326,13 @@ export function DigitalMapPage() {
         </section>
 
         {focusLabel && (
-          <section className="absolute left-1/2 top-[4.5rem] z-10 -translate-x-1/2 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-xs font-medium text-primary-700 shadow-lg">
+          <section className={cn("absolute left-1/2 z-10 -translate-x-1/2 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-xs font-medium text-primary-700 shadow-lg", isEmbedded ? "top-4" : "top-[4.5rem]")}>
             지구본에서 선택한 위치: {focusLabel}
           </section>
         )}
 
         {activeTool === "legend" && (
-          <section className="absolute bottom-4 left-[24rem] z-10 rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">
+          <section className="absolute bottom-4 left-4 z-10 w-80 max-w-[calc(100%-2rem)] rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur xl:left-[24rem] xl:w-auto">
             <p className="mb-2 text-xs font-semibold text-text-muted">범례</p>
             <div className="space-y-1 text-xs text-text-muted">
               <LegendItem color="bg-primary-500" label="진행 프로젝트/시험" />
