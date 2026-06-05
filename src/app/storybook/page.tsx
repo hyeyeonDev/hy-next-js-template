@@ -87,6 +87,7 @@ import {
   UserProfile,
   DataTable,
 } from "@/components/data-display/index";
+import { WorkspaceSamples } from "@/components/features/dashboard/WorkspaceSamples";
 
 /* ─── 헬퍼 ─── */
 function Section({
@@ -1265,6 +1266,15 @@ export default function StorybookPage() {
             결과: <span className="font-semibold">{dialogResult}</span>
           </div>
         )}
+      </Section>
+
+      {/* ── Workspace UI ── */}
+      <Section
+        id="workspace-ui"
+        title="Workspace UI"
+        description="대시보드에서 사용할 플로팅 패널, 브라우저 탭, 스플릿 뷰 컴포넌트"
+      >
+        <WorkspaceSamples />
       </Section>
     </div>
   );

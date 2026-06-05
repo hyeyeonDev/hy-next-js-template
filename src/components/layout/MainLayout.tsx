@@ -29,6 +29,7 @@ interface MainLayoutProps {
   topbar?: React.ReactNode;
   footer?: React.ReactNode;
   className?: string;
+  bodyClassName?: string;
   contentClassName?: string;
 }
 
@@ -38,10 +39,12 @@ export function MainLayout({
   topbar,
   footer,
   className,
+  bodyClassName,
   contentClassName,
 }: MainLayoutProps) {
   const pathname = usePathname();
   const { t } = useI18n();
+
   const defaultSidebarItems = getAdminSidebarItems(t);
   const resolvedSidebar = sidebar ?? {
     logo: (
@@ -72,6 +75,7 @@ export function MainLayout({
       }
     />
   );
+
   const resolvedFooter = footer ?? <Footer />;
 
   return (
@@ -83,7 +87,7 @@ export function MainLayout({
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="shrink-0">{resolvedTopbar}</div>
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto", bodyClassName)}>
           <main className={cn("flex-1 p-6", contentClassName)}>{children}</main>
           <div className="shrink-0">{resolvedFooter}</div>
         </div>

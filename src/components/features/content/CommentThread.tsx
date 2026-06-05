@@ -31,6 +31,12 @@ interface CommentThreadProps {
   allowReplies?: boolean;
 }
 
+const commentActionClass =
+  "h-6 gap-1 rounded px-1.5 text-[11px] font-medium text-text-muted hover:bg-surface-2 hover:text-primary-700";
+const commentDangerActionClass =
+  "h-6 gap-1 rounded px-1.5 text-[11px] font-medium text-text-muted hover:bg-danger-50 hover:text-danger-700";
+const commentActionIconClass = "h-3 w-3";
+
 export function CommentThread({ kind, contentId, allowReplies = true }: CommentThreadProps) {
   const { toast } = useToast();
   const { confirm } = useDialog();
@@ -255,7 +261,8 @@ function CommentItem({
             <Button
               size="xs"
               variant="ghost"
-              leftIcon={<MessageSquareReply aria-hidden="true" />}
+              className={commentActionClass}
+              leftIcon={<MessageSquareReply className={commentActionIconClass} aria-hidden="true" />}
               onClick={() => onStartReply(comment.id)}
             >
               답글
@@ -266,7 +273,8 @@ function CommentItem({
               <Button
                 size="xs"
                 variant="ghost"
-                leftIcon={<Pencil aria-hidden="true" />}
+                className={commentActionClass}
+                leftIcon={<Pencil className={commentActionIconClass} aria-hidden="true" />}
                 onClick={() => onStartEdit(comment)}
               >
                 수정
@@ -274,7 +282,8 @@ function CommentItem({
               <Button
                 size="xs"
                 variant="ghost"
-                leftIcon={<Trash2 aria-hidden="true" />}
+                className={commentDangerActionClass}
+                leftIcon={<Trash2 className={commentActionIconClass} aria-hidden="true" />}
                 loading={loadingDelete}
                 onClick={() => onDelete(comment.id)}
               >
@@ -353,7 +362,8 @@ function CommentItem({
                     <Button
                       size="xs"
                       variant="ghost"
-                      leftIcon={<Pencil aria-hidden="true" />}
+                      className={commentActionClass}
+                      leftIcon={<Pencil className={commentActionIconClass} aria-hidden="true" />}
                       onClick={() => onStartEdit(reply)}
                     >
                       수정
@@ -361,7 +371,8 @@ function CommentItem({
                     <Button
                       size="xs"
                       variant="ghost"
-                      leftIcon={<Trash2 aria-hidden="true" />}
+                      className={commentDangerActionClass}
+                      leftIcon={<Trash2 className={commentActionIconClass} aria-hidden="true" />}
                       loading={loadingDelete}
                       onClick={() => onDelete(reply.id)}
                     >

@@ -50,6 +50,7 @@ const sections: Array<{ id: string; label: string; Icon: LucideIcon }> = [
   { id: "modal", label: "Modal", Icon: PanelTop },
   { id: "toast", label: "Toast / Snackbar", Icon: MessagesSquare },
   { id: "dialog", label: "Dialog", Icon: MessageSquare },
+  { id: "workspace-ui", label: "Workspace UI", Icon: Layers },
 ];
 
 export default function StorybookLayout({ children }: { children: React.ReactNode }) {

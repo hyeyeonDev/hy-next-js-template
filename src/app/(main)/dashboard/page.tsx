@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { Columns3, LayoutPanelTop, Map } from "lucide-react";
 import { BarChart, ChartCard, LineChart } from "@/components/charts";
 import { PageWrapper } from "@/components/layout";
 import { getAdminQuickLinks } from "@/constants/menu";
 import { Badge, Button, Card, CardHeader, CardTitle, CardDescription, Table } from "@/components/ui";
 import { useI18n } from "@/i18n";
+import { ROUTES } from "@/constants/routes";
 
 type Log = { id: number; user: string; action: string; time: string; status: string };
 const recentLogs: Log[] = [
@@ -47,6 +49,26 @@ export default function DashboardPage() {
       ),
     },
   ];
+  const workspaceMenus = [
+    {
+      title: "플로팅 미니맵",
+      description: "화면 위에서 움직이는 상태 확인 패널",
+      href: ROUTES.DASHBOARD_WORKSPACE_MINIMAP,
+      icon: Map,
+    },
+    {
+      title: "브라우저 탭",
+      description: "작업 화면을 탭으로 전환하는 워크스페이스",
+      href: ROUTES.DASHBOARD_WORKSPACE_BROWSER_TABS,
+      icon: LayoutPanelTop,
+    },
+    {
+      title: "스플릿 뷰",
+      description: "목록과 상세 영역의 크기를 직접 조절",
+      href: ROUTES.DASHBOARD_WORKSPACE_SPLIT_VIEW,
+      icon: Columns3,
+    },
+  ];
 
   return (
     <PageWrapper title={t("dashboard.title")} description={t("dashboard.description")}>
@@ -61,6 +83,34 @@ export default function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-text">워크스페이스 UI 메뉴</p>
+            <p className="mt-1 text-sm text-text-muted">각 샘플을 하나의 대시보드 페이지에서 확인합니다.</p>
+          </div>
+          <Link href={`${ROUTES.STORYBOOK}#workspace-ui`}>
+            <Button size="sm" variant="ghost">
+              컴포넌트 모음 보기
+            </Button>
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {workspaceMenus.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.href} href={item.href}>
+                <div className="h-full rounded-md border border-border bg-bg p-4 transition-colors hover:border-primary-300 hover:bg-primary-50">
+                  <Icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  <p className="mt-3 text-sm font-semibold text-text">{item.title}</p>
+                  <p className="mt-1 text-xs text-text-muted">{item.description}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-6">
         {quickLinks.map((item) => {

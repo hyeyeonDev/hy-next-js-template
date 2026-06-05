@@ -12,6 +12,9 @@ export const ROUTES = {
   },
 
   DASHBOARD: "/dashboard",
+  DASHBOARD_WORKSPACE_MINIMAP: "/dashboard/workspace/minimap",
+  DASHBOARD_WORKSPACE_BROWSER_TABS: "/dashboard/workspace/browser-tabs",
+  DASHBOARD_WORKSPACE_SPLIT_VIEW: "/dashboard/workspace/split-view",
   DIGITAL_MAP: "/digital-map",
   DIGITAL_MAP_FULL: "/digital-map/full",
   MY_PAGE: "/mypage",
