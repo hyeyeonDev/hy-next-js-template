@@ -1,14 +1,16 @@
 import {
+  BarChart3,
   Bell,
+  Boxes,
   Building2,
   Database,
   HelpCircle,
   History,
   Languages,
+  Layers,
   Map,
   MessageSquareText,
   Settings,
-  UserRound,
   Users,
 } from "lucide-react";
 
@@ -54,34 +56,6 @@ export const ADMIN_MENU: Array<MenuItemConfig | MenuGroupConfig> = [
     feature: FEATURE_KEYS.DASHBOARD,
     icon: Settings,
     exact: true,
-  },
-  {
-    labelKey: "nav.digitalMap",
-    icon: Map,
-    children: [
-      {
-        labelKey: "nav.digitalMapPage",
-        href: ROUTES.DIGITAL_MAP_FULL,
-        feature: FEATURE_KEYS.DIGITAL_MAP,
-        icon: Map,
-        quickDescriptionKey: "quick.digitalMap",
-      },
-      {
-        labelKey: "nav.digitalMapPopup",
-        href: ROUTES.DIGITAL_MAP,
-        feature: FEATURE_KEYS.DIGITAL_MAP,
-        icon: Map,
-        popup: { width: 1280, height: 820 },
-      },
-    ],
-  },
-  {
-    labelKey: "nav.myPage",
-    href: ROUTES.MY_PAGE,
-    feature: FEATURE_KEYS.MY_PAGE,
-    icon: UserRound,
-    exact: true,
-    activePaths: [ROUTES.MY_PAGE],
   },
   {
     labelKey: "nav.userManagement",
@@ -209,6 +183,50 @@ export function getAdminSidebarItems(t: Translator): SidebarItem[] {
       );
     }),
   );
+}
+
+export function getDigitalMapSidebarItems(): SidebarItem[] {
+  if (!isFeatureEnabled(FEATURE_KEYS.DIGITAL_MAP)) return [];
+
+  return [
+    {
+      label: "페이지 보기",
+      href: ROUTES.DIGITAL_MAP_FULL,
+      icon: Map,
+      exact: true,
+      activePaths: [ROUTES.DIGITAL_MAP_FULL],
+    },
+    {
+      label: "팝업 보기",
+      href: ROUTES.DIGITAL_MAP,
+      icon: Map,
+      popup: { width: 1280, height: 820 },
+    },
+    {
+      label: "시추단면도",
+      href: `${ROUTES.DIGITAL_MAP_FULL}?view=borehole-section`,
+      icon: Layers,
+      activePaths: [ROUTES.DIGITAL_MAP_FULL],
+    },
+    {
+      label: "주상도별 시험결과",
+      href: `${ROUTES.DIGITAL_MAP_FULL}?view=log-test-results`,
+      icon: Database,
+      activePaths: [ROUTES.DIGITAL_MAP_FULL],
+    },
+    {
+      label: "시험결과 분포",
+      href: `${ROUTES.DIGITAL_MAP_FULL}?view=test-distribution`,
+      icon: BarChart3,
+      activePaths: [ROUTES.DIGITAL_MAP_FULL],
+    },
+    {
+      label: "3D 지층정보",
+      href: `${ROUTES.DIGITAL_MAP_FULL}?view=three-dimensional-strata`,
+      icon: Boxes,
+      activePaths: [ROUTES.DIGITAL_MAP_FULL],
+    },
+  ];
 }
 
 export function getAdminQuickLinks(t: Translator): AdminQuickLink[] {
